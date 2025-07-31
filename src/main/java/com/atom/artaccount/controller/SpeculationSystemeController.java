@@ -21,23 +21,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atom.artaccount.Tools;
 import com.atom.artaccount.model.SpeculationSysteme;
+import com.atom.artaccount.model.User;
 import com.atom.artaccount.service.SpeculationSystemeService;
+import com.atom.artaccount.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @CrossOrigin
 public class SpeculationSystemeController {
+	
     @Autowired
     private SpeculationSystemeService speculationsystemeService;
+    
+    @Autowired
+    private UserService userService;
 
-	 @RequestMapping(value="/api/speculation-systeme1", method=RequestMethod.GET)
-	    public MappingJacksonValue listAcheminement() {
-		    Iterable<SpeculationSysteme> acheminements = speculationsystemeService.getAllSpeculationSystemes();
-	        MappingJacksonValue acheminementsFiltres = new MappingJacksonValue(acheminements);
-	        return acheminementsFiltres;
-	    }
+	 @GetMapping("/api/speculation-systeme-page/isconfigured")
+	 public Page<SpeculationSysteme> getSpeculationSystemeConfiguredTrue(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+		 User user = Tools.getUser(userService);
+		 Pageable pageable = PageRequest.of(page, size);
+	     return speculationsystemeService.findBySystemeIdAndPaysIdAndConfigured(user.getSysteme().getId(),  user.getPays().getId(),  true,  pageable);
+	 }
 	 
 	 @GetMapping("/api/speculation-systeme-page")
 	 public Page<SpeculationSysteme> getSpeculationSystemePages(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {

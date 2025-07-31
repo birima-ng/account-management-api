@@ -51,4 +51,10 @@ public class SpeculationSystemeService {
     public Page<SpeculationSysteme> getAll(Pageable pageable ){
     	return speculationsystemeRepository.findAll(pageable);
     }
+    
+    public Page<SpeculationSysteme> findBySystemeIdAndPaysIdAndConfigured(String systemeId, String paysId, Boolean configured, Pageable pageable){
+    	return speculationsystemeRepository.findBySystemeIdAndPaysIdAndConfigured(systemeId,  paysId,  configured,  pageable);
+    	
+    }
+
 }

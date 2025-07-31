@@ -29,6 +29,13 @@ public class SystemeController {
     @Autowired
     private SystemeService systemeService;
 
+	 @GetMapping("/api/systeme-page/current")
+	 public Page<Systeme> getSystemePageCurrent(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+	     Pageable pageable = PageRequest.of(page, size);
+	     return systemeService.findById(pageable);
+	 }
+	 
+
 	 @GetMapping("/api/systeme-page")
 	 public Page<Systeme> getSystemePages(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
 	     Pageable pageable = PageRequest.of(page, size);

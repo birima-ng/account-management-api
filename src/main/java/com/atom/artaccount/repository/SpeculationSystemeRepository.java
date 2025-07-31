@@ -2,6 +2,9 @@ package com.atom.artaccount.repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -11,5 +14,5 @@ public interface SpeculationSystemeRepository extends JpaRepository<SpeculationS
 	boolean existsBySpeculationIdAndSystemeIdAndPaysId(String speculationId, String systemeId, String paysId);
 	Optional<SpeculationSysteme> findBySpeculationIdAndSystemeIdAndPaysId(String speculationId, String systemeId, String paysId);
 	List<SpeculationSysteme> findBySpeculationIdAndSystemeIdAndPaysIdAndConfigured(String speculationId, String systemeId, String paysId, Boolean configured);
-
+	Page<SpeculationSysteme> findBySystemeIdAndPaysIdAndConfigured(String systemeId, String paysId, Boolean configured, Pageable pageable);
 }

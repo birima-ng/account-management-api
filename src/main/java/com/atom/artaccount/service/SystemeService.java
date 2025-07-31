@@ -6,13 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import com.atom.artaccount.Tools;
 import com.atom.artaccount.model.Systeme;
+import com.atom.artaccount.model.User;
 import com.atom.artaccount.repository.SystemeRepository;
 
 @Service
 public class SystemeService {
     @Autowired
     private SystemeRepository systemeRepository;
+    
+    @Autowired
+    private UserService userService;
     
     public List<Systeme> getAllSystemes() {
         return systemeRepository.findAll();
@@ -63,7 +69,27 @@ public class SystemeService {
     	return systemeRepository.findByCode( code);
     }
     
+    public Optional<Systeme> findById(String id){
+    	return systemeRepository.findById(id);
+    }
+    
     public Page<Systeme> getAll(Pageable pageable ){
     	return systemeRepository.findAll(pageable);
     }
+    
+    public Systeme findByIdCurrent(){
+   	     User user = Tools.getUser(userService);
+   	  Optional<Systeme> systeme = systemeRepository.findById(user.getSysteme().getId());
+   	  
+   	  if(systeme.isPresent()) {
+   		  return systeme.get();
+   	  }else {
+   		  return null;
+   	  }
+    }
+    
+	public Page<Systeme> findById(Pageable pageable){
+		User user = Tools.getUser(userService);
+		return  systemeRepository.findById( user.getSysteme().getId(), pageable);
+	}
 }
