@@ -1,6 +1,5 @@
 package com.atom.artaccount.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -118,7 +117,7 @@ public class Pays extends com.atom.artaccount.model.Entity{
 	public void setIndicatif(String indicatif) {
 		this.indicatif = indicatif;
 	}
-
+/*
 	@JsonCreator
 	public Pays(String libelle, String code, String description, String description_en, String langue, String monnaie,
 			String linksectoriel) {
@@ -130,6 +129,6 @@ public class Pays extends com.atom.artaccount.model.Entity{
 		this.langue = langue;
 		this.monnaie = monnaie;
 		this.linksectoriel = linksectoriel;
-	}
+	}*/
     
 }

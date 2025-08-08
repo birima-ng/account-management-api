@@ -24,6 +24,9 @@ public class TypeFicheCollecte extends com.atom.artaccount.model.Entity {
 	@Column(name="libelleen")
     private String libelleen;
 	
+	@Column(name="icon")
+    private String icon;
+	
 	@Lob
 	@Column(name="requete", columnDefinition = "LONGTEXT")
     private String requete;
@@ -81,6 +84,14 @@ public class TypeFicheCollecte extends com.atom.artaccount.model.Entity {
 
 	public void setSysteme(Systeme systeme) {
 		this.systeme = systeme;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
     
 }

@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +36,13 @@ public class SpeculationSystemeController {
     @Autowired
     private UserService userService;
 
+	 @GetMapping("/api/speculation-systeme-page/notconfigured")
+	 public Page<SpeculationSysteme> getSpeculationSystemeConfiguredFalse(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+		 User user = Tools.getUser(userService);
+		 Pageable pageable = PageRequest.of(page, size);
+	     return speculationsystemeService.findBySystemeIdAndPaysIdAndConfigured(user.getSysteme().getId(),  user.getPays().getId(),  false,  pageable);
+	 }
+	 
 	 @GetMapping("/api/speculation-systeme-page/isconfigured")
 	 public Page<SpeculationSysteme> getSpeculationSystemeConfiguredTrue(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
 		 User user = Tools.getUser(userService);
@@ -92,6 +96,25 @@ public class SpeculationSystemeController {
     public ResponseEntity<Void> deleteSpeculationSysteme(@PathVariable String id) {
         speculationsystemeService.deleteSpeculationSysteme(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @PostMapping("/api/speculation-systeme/configuration")
+    public ResponseEntity<Void> updateSpeculationSysteme(@RequestBody List<SpeculationSysteme> speculationsystemes) {
+    	System.out.println("############################## log log log ");
+    	for(SpeculationSysteme speculationsysteme: speculationsystemes) {
+    		System.out.println("speculationsysteme.getId() "+speculationsysteme.getId());
+    		speculationsysteme.setConfigured(true);
+    		speculationsystemeService.updateSpeculationSysteme(speculationsysteme.getId(), speculationsysteme);
+    		
+    	}
+    	  return ResponseEntity.noContent().build();
+    }
+    
+    @PutMapping("/api/speculation-systeme/detache/{id}")
+    public ResponseEntity<SpeculationSysteme> updateSpeculationSystemeDetache(@PathVariable String id, @RequestBody SpeculationSysteme speculationsystemeDetails) {
+    	speculationsystemeDetails.setConfigured(false);
+    	SpeculationSysteme updatedSpeculationSysteme = speculationsystemeService.updateSpeculationSysteme(id, speculationsystemeDetails);
+        return ResponseEntity.ok(updatedSpeculationSysteme);
     }
     
 }

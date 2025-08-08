@@ -31,6 +31,7 @@ public class SpeculationSystemeService {
 
     public SpeculationSysteme updateSpeculationSysteme(String id, SpeculationSysteme speculationsystemeDetails) {
         SpeculationSysteme speculationsysteme = speculationsystemeRepository.findById(id).orElseThrow();
+        System.out.println("speculationsysteme "+speculationsysteme.getId());
         speculationsysteme.setConfigured(speculationsystemeDetails.getConfigured());
         speculationsysteme.setDateupdate();
         return speculationsystemeRepository.save(speculationsysteme);
