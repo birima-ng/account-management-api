@@ -70,9 +70,10 @@ public class ConfigFicheCollecteController {
     }
     
 	 @GetMapping("/api/config-fiche-collecte-page/{id}/type-fiche-collecte")
-	 public Page<ConfigFicheCollecte> getConfigFicheCollectePages(@RequestParam(defaultValue = "id") String id, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+	 public Page<ConfigFicheCollecte> getConfigFicheCollectePages(@PathVariable String id, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
 	     Pageable pageable = PageRequest.of(page, size);
 	     User user = Tools.getUser(userService);
+	     System.out.println("########################## id "+id);
 	     return configfichecollecteService.findByPaysIdAndSystemeIdAndTypeficheId(user.getPays().getId(), user.getSysteme().getId(), id, pageable);
 	 }
     
