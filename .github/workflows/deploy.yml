@@ -29,7 +29,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "target/sectoriel-api.jar"
           target: "/var/www/html/sectoriel-api/"
-
+          strip_components: 1
       - name: Restart Spring Boot service
         uses: appleboy/ssh-action@v0.1.7
         with:
