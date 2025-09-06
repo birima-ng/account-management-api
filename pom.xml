@@ -229,5 +229,6 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>sectoriel-api</finalName>
 	</build>
 </project>
