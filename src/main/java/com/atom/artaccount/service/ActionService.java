@@ -73,4 +73,8 @@ public class ActionService {
     public List<Action> findByFeatureModuleId(String moduleId){
     	return actionRepository.findByFeatureModuleId(moduleId);
     }
+    
+	public List<Action> findByFeatureSystemeId(String systemeId){
+		return actionRepository.findByFeatureSystemeId(systemeId);
+	}
 }

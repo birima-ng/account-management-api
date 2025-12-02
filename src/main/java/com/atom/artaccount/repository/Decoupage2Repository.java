@@ -2,6 +2,9 @@ package com.atom.artaccount.repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -14,5 +17,7 @@ public interface Decoupage2Repository extends JpaRepository<Decoupage2, String>,
 	Optional<Decoupage2> findByCodeOrLibelle(String code, String libelle);
 	Optional<Decoupage2> findByLibelle(String libelle);
 	Optional<Decoupage2> findByCode(String code);
-	List<Decoupage2> findByDecoupage1Id(String paysId);
+	List<Decoupage2> findByDecoupage1Id(String decoupage1Id);
+	List<Decoupage2> findByDecoupage1PaysId(String paysId);
+	Page<Decoupage2> findByDecoupage1PaysId(String paysId, Pageable pageable);
 }

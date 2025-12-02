@@ -15,16 +15,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atom.artaccount.Tools;
 import com.atom.artaccount.dto.FeatureDTO;
 import com.atom.artaccount.dto.FeatureProfileActionDTO;
 import com.atom.artaccount.model.Action;
 import com.atom.artaccount.model.Feature;
 import com.atom.artaccount.model.Profile;
 import com.atom.artaccount.model.ProfileAction;
+import com.atom.artaccount.model.User;
 import com.atom.artaccount.service.ActionService;
 import com.atom.artaccount.service.FeatureService;
 import com.atom.artaccount.service.ProfileActionService;
 import com.atom.artaccount.service.ProfileService;
+import com.atom.artaccount.service.UserService;
 
 @RestController
 @CrossOrigin
@@ -40,11 +43,21 @@ public class FeatureController {
     
     @Autowired
     private ProfileActionService profileactionService;
+    
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/api/feature")
     public List<Feature> getAllFeatures() {
         return featureService.getAllFeatures();
     }
+    
+    @GetMapping("/api/feature/systeme")
+    public List<Feature> getAllFeaturesSysteme() {
+    	User user = Tools.getUser(userService);
+        return featureService.findBySystemeId(user.getSysteme().getId());
+    }
+
 
     @GetMapping("/api/feature/{id}")
     public ResponseEntity<Feature> getFeatureById(@PathVariable String id) {

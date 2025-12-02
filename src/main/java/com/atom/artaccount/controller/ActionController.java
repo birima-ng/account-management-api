@@ -1,9 +1,7 @@
 package com.atom.artaccount.controller;
 
-
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
@@ -17,37 +15,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.atom.artaccount.Tools;
 import com.atom.artaccount.model.Action;
+import com.atom.artaccount.model.User;
 import com.atom.artaccount.service.ActionService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.atom.artaccount.service.UserService;
 
 @RestController
 @CrossOrigin
 public class ActionController {
+	
     @Autowired
     private ActionService actionService;
+    
+    @Autowired
+    private UserService userService;
 
-	 @RequestMapping(value="/api/action1", method=RequestMethod.GET)
-	    public MappingJacksonValue listAcheminement() {
-		    Iterable<Action> acheminements = actionService.getAllActions();
-	        MappingJacksonValue acheminementsFiltres = new MappingJacksonValue(acheminements);
-	        return acheminementsFiltres;
-	    }
+	@RequestMapping(value="/api/action1", method=RequestMethod.GET)
+	public MappingJacksonValue listAcheminement() {
+		Iterable<Action> acheminements = actionService.getAllActions();
+	    MappingJacksonValue acheminementsFiltres = new MappingJacksonValue(acheminements);
+	    return acheminementsFiltres;
+	}
 	 
     @GetMapping("/api/action")
     public List<Action> getAllActions() {
-    	
-    	   ObjectMapper objectMapper = new ObjectMapper();
-           try {
-               String json = objectMapper.writeValueAsString(actionService.getAllActions());
-       
-               System.out.println(json);
-           } catch (JsonProcessingException e) {
-               e.printStackTrace();
-           }
         return actionService.getAllActions();
+    }
+    
+    @GetMapping("/api/action/systeme")
+    public List<Action> getAllActionsSysteme() {
+    	User user = Tools.getUser(userService);
+        return actionService.findByFeatureSystemeId(user.getSysteme().getId());
     }
 
     @GetMapping("/api/action/{id}")
@@ -70,13 +69,6 @@ public class ActionController {
 
     @PutMapping("/api/action/{id}")
     public ResponseEntity<Action> updateAction(@PathVariable String id, @RequestBody Action actionDetails) {
-    	/*Optional<Action> actionsearch=actionService.findByNom(actionDetails.getNom());
-    	System.out.println("################## "+actionsearch.isPresent());
-    	if(actionsearch.isPresent()) {
-    		if(!((actionsearch.get().getId()).equals(id))) {
-    			return null;
-    		}
-    	}*/
     	
     	Optional<Action>  actionsearch=actionService.findByCode(actionDetails.getCode());
     	if(actionsearch.isPresent()) {
@@ -86,7 +78,6 @@ public class ActionController {
     	}
     	
     	Action updatedAction = actionService.updateAction(id, actionDetails);
-    	
         return ResponseEntity.ok(updatedAction);
     }
 
@@ -96,10 +87,9 @@ public class ActionController {
         return ResponseEntity.noContent().build();
     }
     
-	   @GetMapping(value="/api/action/{id}/feature")
-	    public List<Action> listActionByFeature(@PathVariable("id") String id) {
-		    List<Action> actions = actionService.getActionsByFeatureId(id);
-	        //MappingJacksonValue actionsFiltres = new MappingJacksonValue(actions);
-	        return actions;
-	    }
+	@GetMapping(value="/api/action/{id}/feature")
+	public List<Action> listActionByFeature(@PathVariable("id") String id) {
+		 List<Action> actions = actionService.getActionsByFeatureId(id);
+	     return actions;
+	}
 }

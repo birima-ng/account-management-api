@@ -18,16 +18,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atom.artaccount.Tools;
 import com.atom.artaccount.model.Decoupage2;
+import com.atom.artaccount.model.User;
 import com.atom.artaccount.service.Decoupage2Service;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.atom.artaccount.service.UserService;
 
 @RestController
 @CrossOrigin
 public class Decoupage2Controller {
+	
     @Autowired
     private Decoupage2Service decoupage2Service;
+    
+    @Autowired
+    private UserService userService;
+    
+	 @GetMapping("/api/decoupage2-page/pays")
+	 public Page<Decoupage2> getDecoupage2PagesPays(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+	     Pageable pageable = PageRequest.of(page, size);
+	     User user = Tools.getUser(userService);
+	     return decoupage2Service.findByDecoupage1PaysSysteme(user.getPays().getId(), pageable);
+	 }
 
 	 @GetMapping("/api/decoupage2-page")
 	 public Page<Decoupage2> getDecoupage2Pages(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
@@ -37,16 +49,13 @@ public class Decoupage2Controller {
 	 
     @GetMapping("/api/decoupage2")
     public List<Decoupage2> getAllDecoupage2s() {
-    	
-    	   ObjectMapper objectMapper = new ObjectMapper();
-           try {
-               String json = objectMapper.writeValueAsString(decoupage2Service.getAllDecoupage2s());
-       
-               System.out.println(json);
-           } catch (JsonProcessingException e) {
-               e.printStackTrace();
-           }
         return decoupage2Service.getAllDecoupage2s();
+    }
+    
+    @GetMapping("/api/decoupage2/pays")
+    public List<Decoupage2> getAllDecoupage2sPays() {
+    	User user = Tools.getUser(userService);
+        return decoupage2Service.findByDecoupage1PaysId(user.getId());
     }
 
     @GetMapping("/api/decoupage2/{id}")

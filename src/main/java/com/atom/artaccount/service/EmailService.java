@@ -10,6 +10,7 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
+    
 
     public void sendActivationEmail(String to, String token, String nom) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -28,4 +29,15 @@ public class EmailService {
                 "http://localhost:4200/pages/activation?token=" + token);
         mailSender.send(message);
     }
+    
+    
+    public void sendEmail(String to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("ton.email@ton-domaine.com"); // doit être une adresse existante
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
+    }
+    
 }

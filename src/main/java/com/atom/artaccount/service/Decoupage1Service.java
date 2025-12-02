@@ -42,7 +42,7 @@ public class Decoupage1Service {
         return decoupage1Repository.save(decoupage1);
     }
 
-    public List<Decoupage1> findByTypeDecoupage1Id(String paysId) {
+    public List<Decoupage1> findByPaysId(String paysId) {
         Optional<Pays> pays = paysRepository.findById(paysId);
         return pays.map(value -> decoupage1Repository.findByPaysId(paysId)).orElse(null);
     }
@@ -78,4 +78,10 @@ public class Decoupage1Service {
     public Page<Decoupage1> getAll(Pageable pageable ){
     	return decoupage1Repository.findAll(pageable);
     }
+    
+    public Page<Decoupage1> getAllPays(String paysId, Pageable pageable ){
+    	return decoupage1Repository.findByPaysId(paysId,pageable);
+    }
+    
+    
 }

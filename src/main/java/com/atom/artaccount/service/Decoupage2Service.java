@@ -76,4 +76,12 @@ public class Decoupage2Service {
     public Page<Decoupage2> getAll(Pageable pageable ){
     	return decoupage2Repository.findAll(pageable);
     }
+    
+    public 	List<Decoupage2> findByDecoupage1PaysId(String paysId){
+    	return decoupage2Repository.findByDecoupage1PaysId(paysId);
+    }
+    
+    public 	Page<Decoupage2> findByDecoupage1PaysSysteme(String paysId, Pageable pageable){
+    	return decoupage2Repository.findByDecoupage1PaysId(paysId, pageable);
+    }
 }

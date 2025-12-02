@@ -2,22 +2,25 @@ package com.atom.commerce;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+import com.atom.artaccount.ArtAccountApplication;
+import com.atom.artaccount.repository.UserRepository;
+
+@SpringBootTest(classes = ArtAccountApplication.class)
 class CommerceApplicationTests {
-/*
+
     @Autowired
     private UserRepository userRepository;
     
-    @Autowired
+  /*  @Autowired
     private PasswordEncoder passwordEncoder;*/
     
-	//@Test
-	//void contextLoads() {
-		//System.out.println("############@ test birima");
+	@Test
+	void contextLoads() {
+		System.out.println("############@ test birima");
 	       /*User user = new User();
 	        user.setUsername("birima");
 	        user.setPassword(passwordEncoder.encode("birima"));
@@ -25,6 +28,6 @@ class CommerceApplicationTests {
 	         userRepository.save(user);
 	         */
 	     //    System.out.println("############@ test birima 1");
-	//}
+	}
 
 }

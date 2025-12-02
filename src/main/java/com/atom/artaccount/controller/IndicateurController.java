@@ -16,16 +16,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.atom.artaccount.Tools;
 import com.atom.artaccount.model.Indicateur;
+import com.atom.artaccount.model.User;
 import com.atom.artaccount.service.IndicateurService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.atom.artaccount.service.UserService;
 
 @RestController
 @CrossOrigin
 public class IndicateurController {
+	
     @Autowired
     private IndicateurService indicateurService;
+    
+    @Autowired
+    private UserService userService;
 
 	 
 	 @GetMapping("/api/indicateur-page")
@@ -36,16 +41,13 @@ public class IndicateurController {
 	 
     @GetMapping("/api/indicateur")
     public List<Indicateur> getAllIndicateurs() {
-    	
-    	   ObjectMapper objectMapper = new ObjectMapper();
-           try {
-               String json = objectMapper.writeValueAsString(indicateurService.getAllIndicateurs());
-       
-               System.out.println(json);
-           } catch (JsonProcessingException e) {
-               e.printStackTrace();
-           }
         return indicateurService.getAllIndicateurs();
+    }
+    
+    @GetMapping("/api/indicateur/systeme")
+    public List<Indicateur> getAllIndicateursSysteme() {
+    	User user = Tools.getUser(userService);
+        return indicateurService.findBySystemeId(user.getSysteme().getId());
     }
 
     @GetMapping("/api/indicateur/{id}")

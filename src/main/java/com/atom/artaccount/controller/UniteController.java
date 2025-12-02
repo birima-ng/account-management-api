@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atom.artaccount.model.Unite;
+import com.atom.artaccount.service.SmsService;
 import com.atom.artaccount.service.UniteService;
+import com.atom.artaccount.service.WhatsAppService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,6 +33,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UniteController {
     @Autowired
     private UniteService uniteService;
+    
+    @Autowired
+    private SmsService smsService;
+    
+    @Autowired
+    private WhatsAppService whatsAppService;
+    
+    
+   
 
 	 @RequestMapping(value="/api/unite1", method=RequestMethod.GET)
 	    public MappingJacksonValue listAcheminement() {
@@ -94,4 +105,17 @@ public class UniteController {
         return ResponseEntity.noContent().build();
     }
     
+
+    
+    @GetMapping("/api/unite/getoken")
+    public String getToken() {
+    	
+    	whatsAppService.sendMessage("221774517228", "Message test birima");
+    	
+    	String token  = smsService.generateAccessToken();
+    	//String  token ="eyJ0eXAiOiJKV1QiLCJ2ZXIiOiIxLjAiLCJhbGciOiJFUzM4NCIsImtpZCI6Ikg1RkdUNXhDUlJWU0NseG5vTXZCWEtUM1AyckhTRVZUNV9VdE16UFdCYTQifQ.eyJpc3MiOiJodHRwczovL2FwaS5vcmFuZ2UuY29tL29hdXRoL3YzIiwiYXVkIjpbIm9wZSJdLCJleHAiOjE3NjI0MzcyMzAsImlhdCI6MTc2MjQzMzYzMCwianRpIjoidldCRk52V3FTN0p6WVNSZTduRkVFam1XYzB2M05sWlhLNzZjQk1qb1Z6dEJmUFkwNHNEWDJ5OWFYMktiMEZETnVnaXdqTFBJMVZlRWxmWGs4bHBSWVJSTTQ0STFwdUFINVI2TiIsImNsaWVudF9pZCI6IlpOQkZtQVBLUXBFeEw5NHl4c2J5SW4wYnQzdWRRd2dzIiwic3ViIjoiWk5CRm1BUEtRcEV4TDk0eXhzYnlJbjBidDN1ZFF3Z3MiLCJjbGllbnRfbmFtZSI6eyJkZWZhdWx0IjoiYmlyaW1hIn0sImNsaWVudF90YWciOiJsVXJLR3A0U3h0NU92cDliIiwic2NvcGUiOlsib3BlOnNtc19hZG1pbjp2MTphY2Nlc3MiLCJvcGU6c21zbWVzc2FnaW5nOnYxOmFjY2VzcyIsIm9wZTpjYW1hcmFfZ2VvZmVuY2luZ19vcmFuZ2UtbGFiOnYwOmFjY2VzcyJdLCJtY28iOiJTRUtBUEkifQ.Gjbefcx-tJpTDcl40Ote26qzu1B5UAUcjwZP9NmkcKIqwqM01lwsn3Z5vnZI67Ngo5tJdDx44g3l841k_ULeD9JAWVpNg-eM7hyvFBCb-15FpBmARWWX1TQB8pDwbP38";
+        return smsService.sendSms(token, "GOVATHON", "221774517228","2210000", "Waw! test govathon");
+        //return smsService.sendSms(token, "GOVATHON", "221774517228","2210000", "Waw! Feliccitation vous avez gagne le prix GOVATHON 2025. Tests");
+        
+    }
 }

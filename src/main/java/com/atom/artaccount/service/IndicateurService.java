@@ -20,6 +20,10 @@ public class IndicateurService {
     public List<Indicateur> getAllIndicateurs() {
         return indicateurRepository.findAll();
     }
+    
+    public 	List<Indicateur> findBySystemeId(String systemeId){
+    	return indicateurRepository.findBySystemeId(systemeId);
+    }
 
     public Optional<Indicateur> getIndicateurById(String id) {
         return indicateurRepository.findById(id);

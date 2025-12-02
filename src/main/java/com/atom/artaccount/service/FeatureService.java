@@ -257,4 +257,8 @@ public class FeatureService {
         
         return listedtos;
     }
+    
+	public List<Feature> findBySystemeId(String systemeId){
+		 return featureRepository.findBySystemeId(systemeId);
+	}
 }

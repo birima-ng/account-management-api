@@ -13,6 +13,7 @@ public interface ActionRepository extends JpaRepository<Action, String>, JpaSpec
 	Optional<Action> findByNomOrCode(String nom, String code);
 	Optional<Action> findByNom(String nom);
 	Optional<Action> findByCode(String code);
-	List<Action> findByFeatureId(String moduleId);
+	List<Action> findByFeatureId(String featureId);
 	List<Action> findByFeatureModuleId(String moduleId);
+	List<Action> findByFeatureSystemeId(String systemeId);
 }
