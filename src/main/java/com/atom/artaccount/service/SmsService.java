@@ -8,6 +8,8 @@ import java.util.List;
 
 
 import org.springframework.http.*;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,6 +27,12 @@ import java.net.http.HttpResponse;
 @Service
 public class SmsService {
 
+	private final JavaMailSender mailSender;
+
+    public SmsService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+    
 	private final RestTemplate restTemplate = new RestTemplate();
 	private static final String ID = "";
 	private static final String AUTH_TOKEN = "";
@@ -142,7 +150,7 @@ System.out.println("response "+response.toString());
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.setAccept(java.util.List.of(MediaType.APPLICATION_JSON));
-            headers.set("Authorization", "Basic Wk5CRm1BUEtRcEV4TDk0eXhzYnlJbjBidDN1ZFF3Z3M6bURlWFlNTFlZTkRpRjhhZmUzakZ6eG13ak1JakF3N1BpdUt5TUtFVEJhQlI= ");
+            headers.set("Authorization", "Basic bW55OFl0ajZNbEtxdkw3UEF0WkphQmYzT1dDekpvRGY6bGltVTZuNmduZzRFak1zTlJVSW90b3dBVDdRWnNwajM3ZzZRdE81N0F1OXY=");
            // headers.set("Authorization", "Basic NHFyNnR4NzVuUWxxMkhCSG5YRlc5eFdYdVhnZUp5cXM6OEdPQWxpT01NRkVGWDhtUHRLSm5XZE1pcGwwV0xXa2pPNWw1Rm5NVDd0bHA=");
             // 🔹 Corps de la requête
             String body = "grant_type=client_credentials";
@@ -169,6 +177,20 @@ System.out.println("response "+response.toString());
             e.printStackTrace();
             return "Erreur lors de la génération du token : " + e.getMessage();
         }
+    }
+    
+    
+    
+
+    public void sendSimpleMail(String to, String subject, String text) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("reservation@govathon.sn");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+
+        mailSender.send(message);
     }
 
 }
