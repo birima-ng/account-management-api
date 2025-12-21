@@ -25,8 +25,9 @@ public class ApiCronService {
         this.webClient = builder.build();
     }
 
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     public void callPostApi() {
+    	
     	Pageable pageable = PageRequest.of(0, 1);
     	Page<Reservation> list = reservationService.findBySend(false, pageable);
     	for (Reservation reservation : list.getContent()) {
