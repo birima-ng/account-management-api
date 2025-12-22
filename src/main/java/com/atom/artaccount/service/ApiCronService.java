@@ -25,7 +25,7 @@ public class ApiCronService {
         this.webClient = builder.build();
     }
 
-    @Scheduled(cron = "*/3 * * * * *")
+    @Scheduled(cron = "*/4 * * * * *")
     public void callPostApi() {
     	
     	Pageable pageable = PageRequest.of(0, 1);
