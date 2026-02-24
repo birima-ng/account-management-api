@@ -1,6 +1,7 @@
 package com.atom.artaccount.controller;
 
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,13 +10,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.atom.artaccount.model.Message;
+import com.atom.artaccount.service.MessageService;
 
 @RestController
 @RequestMapping("/webhook")
 public class WhatsAppWebhookController {
 
     private static final String VERIFY_TOKEN = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA70Toi";
-
+   
+    @Autowired
+    private MessageService messageService;
     // Vérification du webhook
     @GetMapping
     public ResponseEntity<String> verify(
@@ -33,7 +38,12 @@ public class WhatsAppWebhookController {
     @PostMapping
     public ResponseEntity<Void> receiveMessage(@RequestBody Map<String,Object> payload) {
         System.out.println("Message reçu: " + payload);
+        Message message = new Message();
+        message.setTelephone(payload.toString());
+        message.setMessage(payload+"");
+        messageService.createMessage(message);
         // Tu peux traiter et répondre ici
         return ResponseEntity.ok().build();
+        
     }
 }
