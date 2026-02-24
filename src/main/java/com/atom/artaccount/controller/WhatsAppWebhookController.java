@@ -39,8 +39,8 @@ public class WhatsAppWebhookController {
     public ResponseEntity<Void> receiveMessage(@RequestBody Map<String,Object> payload) {
         System.out.println("Message reçu: " + payload);
         Message message = new Message();
-        message.setTelephone(payload.toString());
-        message.setMessage(payload+"");
+        //message.setTelephone(payload.toString());
+        //message.setMessage(payload+"");
         messageService.createMessage(message);
         // Tu peux traiter et répondre ici
         return ResponseEntity.ok().build();
