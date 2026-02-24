@@ -1,5 +1,6 @@
 package com.atom.artaccount.controller;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class WhatsAppWebhookController {
     }
 
     // Réception des messages
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<Void> receiveMessage(@RequestBody Map<String,Object> payload) {
         System.out.println("Message reçu: " + payload);
         Message message = new Message();
@@ -45,5 +46,37 @@ public class WhatsAppWebhookController {
         // Tu peux traiter et répondre ici
         return ResponseEntity.ok().build();
         
+    }
+    */
+    @PostMapping
+    public ResponseEntity<Void> receiveMessage(@RequestBody Map<String,Object> payload) {
+        System.out.println("Message reçu: " + payload);
+
+        // Exemple : récupérer le numéro de l’expéditeur
+        List<Map<String,Object>> entries = (List<Map<String,Object>>) payload.get("entry");
+        for (Map<String,Object> entry : entries) {
+            List<Map<String,Object>> changes = (List<Map<String,Object>>) entry.get("changes");
+            for (Map<String,Object> change : changes) {
+                Map<String,Object> value = (Map<String,Object>) change.get("value");
+                List<Map<String,Object>> messages = (List<Map<String,Object>>) value.get("messages");
+                if (messages != null) {
+                    for (Map<String,Object> message : messages) {
+                        String from = (String) message.get("from"); // numéro WhatsApp
+                        String text = ((Map<String,Object>) message.get("text")).get("body").toString();
+
+                        System.out.println("Message de " + from + ": " + text);
+                        Message message1 = new Message();
+                        message1.setTelephone(from);
+                        message1.setMessage(text);
+                        messageService.createMessage(message1);
+                        
+                        // Réponse automatique
+                        //sendMessage(from, "Bonjour, j'ai reçu ton message: " + text);
+                    }
+                }
+            }
+        }
+
+        return ResponseEntity.ok().build();
     }
 }
