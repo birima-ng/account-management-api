@@ -26,6 +26,8 @@ public class FluxController {
         reclamationService.createReclamation(new Reclamation(flux));
         return ResponseEntity.ok("Flux Meta reçu avec succès");
     }
+    
+    
 
    
 }
