@@ -14,6 +14,9 @@ public class Message extends com.atom.artaccount.model.Entity {
 
 	@Column(name="telephone")
     private String telephone;
+	
+	@Column(name="idwhatsapp")
+    private String idwhatsapp;
 
 	@Lob
 	@Column(name="message", columnDefinition = "LONGTEXT")
@@ -33,6 +36,14 @@ public class Message extends com.atom.artaccount.model.Entity {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public String getIdwhatsapp() {
+		return idwhatsapp;
+	}
+
+	public void setIdwhatsapp(String idwhatsapp) {
+		this.idwhatsapp = idwhatsapp;
 	}
 
     

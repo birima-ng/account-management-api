@@ -63,11 +63,13 @@ public class WhatsAppWebhookController {
                     for (Map<String,Object> message : messages) {
                         String from = (String) message.get("from"); // numéro WhatsApp
                         String text = ((Map<String,Object>) message.get("text")).get("body").toString();
+                        String messageId = message.get("id").toString();
 
                         System.out.println("Message de " + from + ": " + text);
                         Message message1 = new Message();
                         message1.setTelephone(from);
                         message1.setMessage(text);
+                        message1.setIdwhatsapp(messageId);
                         messageService.createMessage(message1);
                         
                         // Réponse automatique
