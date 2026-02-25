@@ -49,13 +49,13 @@ public class FluxController {
             }
 
             // =========================
-            // 2️⃣ Décrypt AES key (URL-safe Base64)
+            // 2️⃣ Décrypt AES key (RSA)
             // =========================
             Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
             rsaCipher.init(Cipher.DECRYPT_MODE, getPrivateKey());
 
             byte[] aesKeyBytes = rsaCipher.doFinal(
-                    Base64.getUrlDecoder().decode(encryptedAesKey)
+                    safeBase64Decode(encryptedAesKey)
             );
 
             SecretKey aesKey = new SecretKeySpec(aesKeyBytes, "AES");
@@ -63,14 +63,14 @@ public class FluxController {
             // =========================
             // 3️⃣ Décrypt Flow Data (AES)
             // =========================
-            byte[] ivBytes = Base64.getUrlDecoder().decode(ivB64);
+            byte[] ivBytes = safeBase64Decode(ivB64);
             IvParameterSpec iv = new IvParameterSpec(ivBytes);
 
             Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             aesCipher.init(Cipher.DECRYPT_MODE, aesKey, iv);
 
             byte[] decryptedBytes = aesCipher.doFinal(
-                    Base64.getUrlDecoder().decode(encryptedFlowData)
+                    safeBase64Decode(encryptedFlowData)
             );
 
             String decryptedJson = new String(decryptedBytes, StandardCharsets.UTF_8);
@@ -89,7 +89,7 @@ public class FluxController {
             // =========================
             // 5️⃣ Traitement formulaire
             // =========================
-            //String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
+           // String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
 
             Map<String, Object> responsePayload = Map.of(
                     "screen", "SUCCESS",
@@ -114,10 +114,12 @@ public class FluxController {
                     aesCipher.doFinal(responseJson.getBytes(StandardCharsets.UTF_8));
 
             String encryptedBase64 =
-                    Base64.getUrlEncoder().withoutPadding().encodeToString(encryptedResponse);
+                    Base64.getUrlEncoder().withoutPadding()
+                            .encodeToString(encryptedResponse);
 
             String ivBase64 =
-                    Base64.getUrlEncoder().withoutPadding().encodeToString(newIvBytes);
+                    Base64.getUrlEncoder().withoutPadding()
+                            .encodeToString(newIvBytes);
 
             // =========================
             // 7️⃣ Retour HTTP 200
@@ -133,30 +135,20 @@ public class FluxController {
             return "{\"status\":\"error\",\"message\":\"Erreur traitement Flow"+e.getMessage()+"\"}";
         }
     }
-    
-    private String encryptFlowResponse(Map<String, Object> response, SecretKey aesKey) throws Exception {
-        // Convertir l'objet Map en JSON
-        String json = mapper.writeValueAsString(response);
 
-        // Générer un IV aléatoire
-        byte[] ivBytes = new byte[16];
-        new SecureRandom().nextBytes(ivBytes);
-        IvParameterSpec iv = new IvParameterSpec(ivBytes);
+    private byte[] safeBase64Decode(String value) {
 
-        // Chiffrement AES
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, aesKey, iv);
-        byte[] encrypted = cipher.doFinal(json.getBytes(StandardCharsets.UTF_8));
+        String cleaned = value
+                .replaceAll("\\s", "")
+                .replace("\n", "")
+                .replace("\r", "");
 
-        // Encoder en Base64
-        String encryptedBase64 = Base64.getEncoder().encodeToString(encrypted);
-        String ivBase64 = Base64.getEncoder().encodeToString(ivBytes);
-
-        // Retourner JSON compatible Meta Flow
-        return String.format("{\"encrypted_flow_data\":\"%s\",\"initial_vector\":\"%s\"}",
-                encryptedBase64, ivBase64);
+        try {
+            return Base64.getUrlDecoder().decode(cleaned);
+        } catch (IllegalArgumentException e) {
+            return Base64.getDecoder().decode(cleaned);
+        }
     }
-
     // ===============================
     // Lazy load clé privée
     // ===============================
