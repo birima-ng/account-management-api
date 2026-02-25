@@ -69,7 +69,7 @@ public class FluxController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "{\"status\":\"error\",\"message\":\"Erreur traitement Flow\"}";
+            return "{\"status\":\"error\",\"message\":\"Erreur traitement Flow"+e.getMessage()+"\"}";
         }
     }
     
