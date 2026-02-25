@@ -158,20 +158,17 @@ public class FluxController {
             return privateKey;
         }
 
-        System.out.println("🔐 Chargement clé depuis : " + privateKeyPath);
-
         String pem = Files.readString(Path.of(privateKeyPath));
 
-        String content = pem
+        // 🔥 Nettoyage strict
+        pem = pem
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s", "");
+                .replaceAll("\\s", "");   // enlève TOUT espaces, \n, \r
 
-        byte[] keyBytes = Base64.getDecoder().decode(content);
+        byte[] keyBytes = Base64.getDecoder().decode(pem);
 
-        PKCS8EncodedKeySpec spec =
-                new PKCS8EncodedKeySpec(keyBytes);
-
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
 
         privateKey = (RSAPrivateKey) kf.generatePrivate(spec);
