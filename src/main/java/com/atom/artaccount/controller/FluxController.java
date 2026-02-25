@@ -34,7 +34,7 @@ public class FluxController {
 
     public FluxController() throws Exception {
         // Charger depuis classpath
-        ClassPathResource resource = new ClassPathResource("private.pem"); //cles
+        ClassPathResource resource = new ClassPathResource("private.pem"); //cles new
         String privateKeyPem = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         this.privateKey = loadPrivateKey(privateKeyPem);
     }
