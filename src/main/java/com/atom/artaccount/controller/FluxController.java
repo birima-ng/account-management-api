@@ -35,7 +35,7 @@ public class FluxController {
     @PostMapping("/inscription")
     public ResponseEntity<?> recevoirFlux(@RequestBody Map<String, String> payload) {
 
-        try {
+        /*try {
 
             // 1️⃣ Récupération données chiffrées
             String encryptedAesKey = payload.get("encrypted_aes_key");
@@ -67,7 +67,7 @@ public class FluxController {
             // ===============================
             // Traitement formulaire
             // ===============================
-           /* String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
+           String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
 
             Map<String, Object> responsePayload = Map.of(
                     "screen", "SUCCESS",
@@ -75,7 +75,7 @@ public class FluxController {
                             "message", "Merci " + nom + ", formulaire validé."
                     )
             );
-*/
+
             Map<String, Object> responsePayload = Map.of(
                     "screen", "SUCCESS",
                     "data", Map.of(
@@ -92,9 +92,10 @@ public class FluxController {
            // e.printStackTrace();
             return ResponseEntity.internalServerError()
                     .body("Erreur traitement Flow");
-        }
+        }*/
         
-        
+        return ResponseEntity.ok()
+                .body("ok birima traitement Flow");
     }
 
     // ===============================
