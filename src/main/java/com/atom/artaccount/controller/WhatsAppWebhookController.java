@@ -48,13 +48,14 @@ public class WhatsAppWebhookController {
         
     }
     */
-    /*@PostMapping
+    @PostMapping
     public ResponseEntity<Void> receiveMessage(@RequestBody Map<String,Object> payload) {
         System.out.println("Message reçu: " + payload);
 
         // Exemple : récupérer le numéro de l’expéditeur
         List<Map<String,Object>> entries = (List<Map<String,Object>>) payload.get("entry");
         for (Map<String,Object> entry : entries) {
+        	String wabaId = entry.get("id").toString();
             List<Map<String,Object>> changes = (List<Map<String,Object>>) entry.get("changes");
             for (Map<String,Object> change : changes) {
                 Map<String,Object> value = (Map<String,Object>) change.get("value");
@@ -69,6 +70,8 @@ public class WhatsAppWebhookController {
                         Message message1 = new Message();
                         message1.setTelephone(from);
                         message1.setMessage(text);
+                        message1.setWabaid(wabaId);
+                       
                         messageService.createMessage(message1);
                         
                         // Réponse automatique
@@ -79,9 +82,9 @@ public class WhatsAppWebhookController {
         }
 
         return ResponseEntity.ok().build();
-    }*/
+    }
     
-    @PostMapping("/webhook")
+    /*@PostMapping("/webhook")
     public ResponseEntity<Void> receive(@RequestBody Map<String,Object> payload) {
 
         List<Map<String,Object>> entries =
@@ -150,5 +153,5 @@ public class WhatsAppWebhookController {
         }
 
         return ResponseEntity.ok().build();
-    }
+    }*/
 }
