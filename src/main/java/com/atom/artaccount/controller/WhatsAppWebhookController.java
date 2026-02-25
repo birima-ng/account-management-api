@@ -58,7 +58,12 @@ public class WhatsAppWebhookController {
         	String wabaId = entry.get("id").toString();
             List<Map<String,Object>> changes = (List<Map<String,Object>>) entry.get("changes");
             for (Map<String,Object> change : changes) {
+            	
                 Map<String,Object> value = (Map<String,Object>) change.get("value");
+                Map<String,Object> metadata = (Map<String,Object>) value.get("metadata");
+
+                String phoneNumberId = metadata.get("phone_number_id").toString();
+                
                 List<Map<String,Object>> messages = (List<Map<String,Object>>) value.get("messages");
                 if (messages != null) {
                     for (Map<String,Object> message : messages) {
@@ -71,6 +76,7 @@ public class WhatsAppWebhookController {
                         message1.setTelephone(from);
                         message1.setMessage(text);
                         message1.setWabaid(wabaId);
+                        message1.setPhonenumberid(phoneNumberId);
                        
                         messageService.createMessage(message1);
                         
