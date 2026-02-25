@@ -48,7 +48,7 @@ public class WhatsAppWebhookController {
         
     }
     */
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<Void> receiveMessage(@RequestBody Map<String,Object> payload) {
         System.out.println("Message reçu: " + payload);
 
@@ -69,11 +69,81 @@ public class WhatsAppWebhookController {
                         Message message1 = new Message();
                         message1.setTelephone(from);
                         message1.setMessage(text);
-                        message1.setIdwhatsapp(messageId);
                         messageService.createMessage(message1);
                         
                         // Réponse automatique
                         //sendMessage(from, "Bonjour, j'ai reçu ton message: " + text);
+                    }
+                }
+            }
+        }
+
+        return ResponseEntity.ok().build();
+    }*/
+    
+    @PostMapping("/webhook")
+    public ResponseEntity<Void> receive(@RequestBody Map<String,Object> payload) {
+
+        List<Map<String,Object>> entries =
+                (List<Map<String,Object>>) payload.get("entry");
+
+        for (Map<String,Object> entry : entries) {
+
+            String wabaId = entry.get("id").toString(); // WhatsApp Business Account ID
+
+            List<Map<String,Object>> changes =
+                    (List<Map<String,Object>>) entry.get("changes");
+
+            for (Map<String,Object> change : changes) {
+
+                Map<String,Object> value =
+                        (Map<String,Object>) change.get("value");
+
+                Map<String,Object> metadata =
+                        (Map<String,Object>) value.get("metadata");
+
+                String phoneNumberId =
+                        metadata.get("phone_number_id").toString();
+
+                String displayPhoneNumber =
+                        metadata.get("display_phone_number").toString();
+
+                List<Map<String,Object>> messages =
+                        (List<Map<String,Object>>) value.get("messages");
+
+                if (messages != null) {
+                    for (Map<String,Object> message : messages) {
+
+                        String messageId = message.get("id").toString();
+                        String from = message.get("from").toString();
+
+                        String text = null;
+
+                        if (message.containsKey("text")) {
+                            text = ((Map<String,Object>) message.get("text"))
+                                    .get("body")
+                                    .toString();
+                        }
+
+                        System.out.println("WABA ID: " + wabaId);
+                        System.out.println("Phone Number ID: " + phoneNumberId);
+                        System.out.println("Mon numéro: " + displayPhoneNumber);
+                        System.out.println("Message ID: " + messageId);
+                        System.out.println("From: " + from);
+                        System.out.println("Text: " + text);
+                       
+                        
+                        Message message1 = new Message();
+                        
+                        message1.setWabaid(wabaId);
+                        message1.setPhonenumberid(phoneNumberId);
+                        message1.setDisplayphonenumber(displayPhoneNumber);
+                        message1.setMessageid(messageId);
+                        message1.setTelephone(from);
+                        message1.setMessage(text);
+                        
+                        messageService.createMessage(message1);
+                        
                     }
                 }
             }

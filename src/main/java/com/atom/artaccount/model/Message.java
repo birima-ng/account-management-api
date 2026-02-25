@@ -15,9 +15,19 @@ public class Message extends com.atom.artaccount.model.Entity {
 	@Column(name="telephone")
     private String telephone;
 	
-	@Column(name="idwhatsapp")
-    private String idwhatsapp;
 
+	@Column(name="wabaid")
+	private String wabaid;
+	
+	@Column(name="phonenumberid")
+	private String phonenumberid;
+	
+	@Column(name="displayphonenumber")
+	private String displayphonenumber;
+	
+	@Column(name="messageid")
+	private String messageid;
+    
 	@Lob
 	@Column(name="message", columnDefinition = "LONGTEXT")
 	private String message;
@@ -38,12 +48,36 @@ public class Message extends com.atom.artaccount.model.Entity {
 		this.message = message;
 	}
 
-	public String getIdwhatsapp() {
-		return idwhatsapp;
+	public String getWabaid() {
+		return wabaid;
 	}
 
-	public void setIdwhatsapp(String idwhatsapp) {
-		this.idwhatsapp = idwhatsapp;
+	public void setWabaid(String wabaid) {
+		this.wabaid = wabaid;
+	}
+
+	public String getPhonenumberid() {
+		return phonenumberid;
+	}
+
+	public void setPhonenumberid(String phonenumberid) {
+		this.phonenumberid = phonenumberid;
+	}
+
+	public String getDisplayphonenumber() {
+		return displayphonenumber;
+	}
+
+	public void setDisplayphonenumber(String displayphonenumber) {
+		this.displayphonenumber = displayphonenumber;
+	}
+
+	public String getMessageid() {
+		return messageid;
+	}
+
+	public void setMessageid(String messageid) {
+		this.messageid = messageid;
 	}
 
     
