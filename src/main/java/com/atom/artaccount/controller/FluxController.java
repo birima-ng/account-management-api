@@ -33,69 +33,67 @@ public class FluxController {
     // Endpoint principal Flow
     // ===============================
     @PostMapping("/inscription")
-    public ResponseEntity<?> recevoirFlux(@RequestBody Map<String, String> payload) {
+    @ResponseBody
+    public String recevoirFlux(@RequestBody Map<String, String> payload) {
 
-        /*try {
-
-            // 1️⃣ Récupération données chiffrées
+        try {
             String encryptedAesKey = payload.get("encrypted_aes_key");
             String encryptedFlowData = payload.get("encrypted_flow_data");
             String iv = payload.get("initial_vector");
 
             if (encryptedAesKey == null || encryptedFlowData == null || iv == null) {
-                return ResponseEntity.badRequest().body("Payload invalide");
+                return "{\"status\":\"error\",\"message\":\"Payload invalide\"}";
             }
 
-            // 2️⃣ Décrypt AES key
+            // Décryptage AES key
             SecretKey aesKey = decryptAesKey(encryptedAesKey);
 
-            // 3️⃣ Décrypt Flow JSON
+            // Décryptage payload Flow
             String decryptedJson = decryptFlowData(encryptedFlowData, aesKey, iv);
+            Map<String, Object> flowData = mapper.readValue(decryptedJson, Map.class);
 
-            System.out.println("📥 Flow déchiffré : " + decryptedJson);
-
-            Map<String, Object> flowData =
-                    mapper.readValue(decryptedJson, Map.class);
-
-            // ===============================
-            // Health Check Meta
-            // ===============================
+            // Health check
             if ("ping".equals(flowData.get("action"))) {
-                return ResponseEntity.ok(Map.of("status", "active"));
+                return "{\"status\":\"active\"}";
             }
 
-            // ===============================
             // Traitement formulaire
-            // ===============================
-           String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
-
+           // String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
             Map<String, Object> responsePayload = Map.of(
                     "screen", "SUCCESS",
-                    "data", Map.of(
-                            "message", "Merci " + nom + ", formulaire validé."
-                    )
+                    "data", Map.of("message", "Merci , formulaire validé.")
             );
 
-            Map<String, Object> responsePayload = Map.of(
-                    "screen", "SUCCESS",
-                    "data", Map.of(
-                            "message", "Merci , formulaire validé."
-                    )
-            );
-            // 4️⃣ Encrypt réponse
-            Map<String, String> encryptedResponse =
-                    encryptResponse(responsePayload, aesKey);
-
-            return ResponseEntity.ok(encryptedResponse);
+            // 🔐 Re-chiffrement réponse avec AES et Base64
+            return encryptFlowResponse(responsePayload, aesKey);
 
         } catch (Exception e) {
-           // e.printStackTrace();
-            return ResponseEntity.internalServerError()
-                    .body("Erreur traitement Flow");
-        }*/
-        
-        return ResponseEntity.ok()
-                .body("ok birima traitement Flow");
+            e.printStackTrace();
+            return "{\"status\":\"error\",\"message\":\"Erreur traitement Flow\"}";
+        }
+    }
+    
+    private String encryptFlowResponse(Map<String, Object> response, SecretKey aesKey) throws Exception {
+        // Convertir l'objet Map en JSON
+        String json = mapper.writeValueAsString(response);
+
+        // Générer un IV aléatoire
+        byte[] ivBytes = new byte[16];
+        new SecureRandom().nextBytes(ivBytes);
+        IvParameterSpec iv = new IvParameterSpec(ivBytes);
+
+        // Chiffrement AES
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, iv);
+        byte[] encrypted = cipher.doFinal(json.getBytes(StandardCharsets.UTF_8));
+
+        // Encoder en Base64
+        String encryptedBase64 = Base64.getEncoder().encodeToString(encrypted);
+        String ivBase64 = Base64.getEncoder().encodeToString(ivBytes);
+
+        // Retourner JSON compatible Meta Flow
+        return String.format("{\"encrypted_flow_data\":\"%s\",\"initial_vector\":\"%s\"}",
+                encryptedBase64, ivBase64);
     }
 
     // ===============================
