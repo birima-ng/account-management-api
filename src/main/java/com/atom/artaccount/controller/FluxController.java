@@ -67,7 +67,7 @@ public class FluxController {
             // ===============================
             // Traitement formulaire
             // ===============================
-            String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
+           /* String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
 
             Map<String, Object> responsePayload = Map.of(
                     "screen", "SUCCESS",
@@ -75,7 +75,13 @@ public class FluxController {
                             "message", "Merci " + nom + ", formulaire validé."
                     )
             );
-
+*/
+            Map<String, Object> responsePayload = Map.of(
+                    "screen", "SUCCESS",
+                    "data", Map.of(
+                            "message", "Merci , formulaire validé."
+                    )
+            );
             // 4️⃣ Encrypt réponse
             Map<String, String> encryptedResponse =
                     encryptResponse(responsePayload, aesKey);
@@ -83,10 +89,12 @@ public class FluxController {
             return ResponseEntity.ok(encryptedResponse);
 
         } catch (Exception e) {
-            e.printStackTrace();
+           // e.printStackTrace();
             return ResponseEntity.internalServerError()
                     .body("Erreur traitement Flow");
         }
+        
+        
     }
 
     // ===============================
