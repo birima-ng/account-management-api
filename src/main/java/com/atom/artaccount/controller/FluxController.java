@@ -1,85 +1,188 @@
 package com.atom.artaccount.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyFactory;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Map;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping("/api/flux")
 public class FluxController {
 
-    private final RSAPrivateKey privateKey;
+    @Value("${app.private-key-path}")
+    private String privateKeyPath;
 
-    public FluxController() throws Exception {
-        // Charger depuis classpath
-        ClassPathResource resource = new ClassPathResource("private.pem"); //cles new
-        String privateKeyPem = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        this.privateKey = loadPrivateKey(privateKeyPem);
-    }
+    private RSAPrivateKey privateKey;
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    // ===============================
+    // Endpoint principal Flow
+    // ===============================
     @PostMapping("/inscription")
-    public ResponseEntity<Map<String, Object>> recevoirFlux(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> recevoirFlux(@RequestBody Map<String, String> payload) {
+
         try {
-            String encryptedAesKey = (String) payload.get("encrypted_aes_key");
-            String encryptedFlowData = (String) payload.get("encrypted_flow_data");
-            String initialVector = (String) payload.get("initial_vector");
 
-            SecretKey aesKey = decryptAesKey(encryptedAesKey, privateKey);
-            String flowDataJson = decryptFlowData(encryptedFlowData, aesKey, initialVector);
+            // 1️⃣ Récupération données chiffrées
+            String encryptedAesKey = payload.get("encrypted_aes_key");
+            String encryptedFlowData = payload.get("encrypted_flow_data");
+            String iv = payload.get("initial_vector");
 
-            System.out.println("Données Flow déchiffrées : " + flowDataJson);
+            if (encryptedAesKey == null || encryptedFlowData == null || iv == null) {
+                return ResponseEntity.badRequest().body("Payload invalide");
+            }
 
-            Map<String, Object> response = Map.of("status", "ok");
-            return ResponseEntity.ok(response);
+            // 2️⃣ Décrypt AES key
+            SecretKey aesKey = decryptAesKey(encryptedAesKey);
+
+            // 3️⃣ Décrypt Flow JSON
+            String decryptedJson = decryptFlowData(encryptedFlowData, aesKey, iv);
+
+            System.out.println("📥 Flow déchiffré : " + decryptedJson);
+
+            Map<String, Object> flowData =
+                    mapper.readValue(decryptedJson, Map.class);
+
+            // ===============================
+            // Health Check Meta
+            // ===============================
+            if ("ping".equals(flowData.get("action"))) {
+                return ResponseEntity.ok(Map.of("status", "active"));
+            }
+
+            // ===============================
+            // Traitement formulaire
+            // ===============================
+            String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
+
+            Map<String, Object> responsePayload = Map.of(
+                    "screen", "SUCCESS",
+                    "data", Map.of(
+                            "message", "Merci " + nom + ", formulaire validé."
+                    )
+            );
+
+            // 4️⃣ Encrypt réponse
+            Map<String, String> encryptedResponse =
+                    encryptResponse(responsePayload, aesKey);
+
+            return ResponseEntity.ok(encryptedResponse);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body(Map.of("status", "error", "message", e.getMessage()));
+            return ResponseEntity.internalServerError()
+                    .body("Erreur traitement Flow");
         }
     }
 
-    // ---------------- Méthodes utilitaires ----------------
+    // ===============================
+    // Lazy load clé privée
+    // ===============================
+    private RSAPrivateKey getPrivateKey() throws Exception {
 
-    private RSAPrivateKey loadPrivateKey(String pem) throws Exception {
-        String privateKeyContent = pem
-                .replaceAll("\\n", "")
+        if (privateKey != null) {
+            return privateKey;
+        }
+
+        System.out.println("🔐 Chargement clé depuis : " + privateKeyPath);
+
+        String pem = Files.readString(Path.of(privateKeyPath));
+
+        String content = pem
                 .replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "");
-        byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+
+        byte[] keyBytes = Base64.getDecoder().decode(content);
+
+        PKCS8EncodedKeySpec spec =
+                new PKCS8EncodedKeySpec(keyBytes);
+
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        return (RSAPrivateKey) kf.generatePrivate(keySpec);
+
+        privateKey = (RSAPrivateKey) kf.generatePrivate(spec);
+
+        return privateKey;
     }
 
-    private SecretKey decryptAesKey(String encryptedAesKeyB64, RSAPrivateKey privateKey) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] aesKeyBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedAesKeyB64));
+    // ===============================
+    // Décrypt AES key via RSA
+    // ===============================
+    private SecretKey decryptAesKey(String encryptedKeyB64) throws Exception {
+
+        Cipher cipher =
+                Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+
+        cipher.init(Cipher.DECRYPT_MODE, getPrivateKey());
+
+        byte[] aesKeyBytes =
+                cipher.doFinal(Base64.getDecoder().decode(encryptedKeyB64));
+
         return new SecretKeySpec(aesKeyBytes, "AES");
     }
 
-    private String decryptFlowData(String encryptedDataB64, SecretKey aesKey, String ivB64) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        IvParameterSpec iv = new IvParameterSpec(Base64.getDecoder().decode(ivB64));
+    // ===============================
+    // Décrypt Flow data AES
+    // ===============================
+    private String decryptFlowData(String encryptedDataB64,
+                                   SecretKey aesKey,
+                                   String ivB64) throws Exception {
+
+        Cipher cipher =
+                Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        IvParameterSpec iv =
+                new IvParameterSpec(Base64.getDecoder().decode(ivB64));
+
         cipher.init(Cipher.DECRYPT_MODE, aesKey, iv);
-        byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedDataB64));
+
+        byte[] decrypted =
+                cipher.doFinal(Base64.getDecoder().decode(encryptedDataB64));
+
         return new String(decrypted, StandardCharsets.UTF_8);
+    }
+
+    // ===============================
+    // Encrypt réponse vers Meta
+    // ===============================
+    private Map<String, String> encryptResponse(
+            Map<String, Object> response,
+            SecretKey aesKey) throws Exception {
+
+        String json = mapper.writeValueAsString(response);
+
+        Cipher cipher =
+                Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        byte[] ivBytes = new byte[16];
+        new SecureRandom().nextBytes(ivBytes);
+
+        IvParameterSpec iv = new IvParameterSpec(ivBytes);
+
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, iv);
+
+        byte[] encrypted =
+                cipher.doFinal(json.getBytes(StandardCharsets.UTF_8));
+
+        return Map.of(
+                "encrypted_flow_data",
+                Base64.getEncoder().encodeToString(encrypted),
+                "initial_vector",
+                Base64.getEncoder().encodeToString(ivBytes)
+        );
     }
 }
