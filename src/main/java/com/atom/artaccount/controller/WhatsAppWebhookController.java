@@ -135,10 +135,10 @@ public class WhatsAppWebhookController {
                         
                         Message message1 = new Message();
                         
-                        message1.setWabaid(wabaId);
-                        message1.setPhonenumberid(phoneNumberId);
-                        message1.setDisplayphonenumber(displayPhoneNumber);
-                        message1.setMessageid(messageId);
+                        //message1.setWabaid(wabaId);
+                        //message1.setPhonenumberid(phoneNumberId);
+                        //message1.setDisplayphonenumber(displayPhoneNumber);
+                        //message1.setMessageid(messageId);
                         message1.setTelephone(from);
                         message1.setMessage(text);
                         
