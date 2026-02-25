@@ -89,12 +89,12 @@ public class FluxController {
             // =========================
             // 5️⃣ Traitement formulaire
             // =========================
-            String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
+            //String nom = (String) flowData.getOrDefault("nom", "Utilisateur");
 
             Map<String, Object> responsePayload = Map.of(
                     "screen", "SUCCESS",
                     "data", Map.of(
-                            "message", "Merci " + nom + ", formulaire validé."
+                            "message", "Merci , formulaire validé."
                     )
             );
 
@@ -130,7 +130,7 @@ public class FluxController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "{\"status\":\"error\",\"message\":\"Erreur traitement Flow\"}";
+            return "{\"status\":\"error\",\"message\":\"Erreur traitement Flow"+e.getMessage()+"\"}";
         }
     }
     
