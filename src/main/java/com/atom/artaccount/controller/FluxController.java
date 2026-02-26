@@ -100,8 +100,24 @@ public class FluxController {
             /*String clearResponse =
                     "{\"screen\":\"QUESTION_ONE\",\"data\":{\"message\":\"Demande reçue\"}}";*/
             
-            String clearResponse =
-            	    "{\"screen\":\"SUCCESS\",\"data\":{}}";
+            Map<String, Object> request =
+            	    new ObjectMapper().readValue(clearJson, Map.class);
+
+            	String action = (String) request.get("action");
+            	String clearResponse;
+
+            	if ("ping".equals(action)) {
+
+            	    clearResponse = "{\"data\":{\"status\":\"active\"}}";
+
+            	} else if ("complete".equals(action)) {
+
+            	    clearResponse = "{\"screen\":\"SUCCESS\",\"data\":{}}";
+
+            	} else {
+
+            	    clearResponse = "{\"screen\":\"SUCCESS\",\"data\":{}}";
+            	}
 
             // IMPORTANT : flip IV comme dans l'exemple officiel
             byte[] flippedIv = flipIv(iv);
