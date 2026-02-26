@@ -1,22 +1,30 @@
 package com.atom.artaccount.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import javax.crypto.spec.IvParameterSpec;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyFactory;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Map;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api/flux")
@@ -38,98 +46,92 @@ public class FluxController {
         try {
 
             // =========================
-            // 1️⃣ Récupération et nettoyage
+            // 1️⃣ Decode Base64
             // =========================
-            String encryptedAesKey = clean(payload.get("encrypted_aes_key"));
-            String encryptedFlowData = clean(payload.get("encrypted_flow_data"));
-            String ivB64 = clean(payload.get("initial_vector"));
+            byte[] encryptedFlowData =
+                    Base64.getDecoder().decode(payload.get("encrypted_flow_data"));
 
-            if (encryptedAesKey == null || encryptedFlowData == null || ivB64 == null) {
-                return ResponseEntity.ok("{\"status\":\"error\",\"message\":\"Payload invalide\"}");
-            }
+            byte[] encryptedAesKey =
+                    Base64.getDecoder().decode(payload.get("encrypted_aes_key"));
+
+            byte[] iv =
+                    Base64.getDecoder().decode(payload.get("initial_vector"));
 
             // =========================
-            // 2️⃣ Décrypt AES Key (RSA)
+            // 2️⃣ RSA decrypt AES key
             // =========================
             Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-            rsaCipher.init(Cipher.DECRYPT_MODE, getPrivateKey());
 
-            byte[] aesKeyBytes = rsaCipher.doFinal(decodeBase64(encryptedAesKey));
-            SecretKey aesKey = new SecretKeySpec(aesKeyBytes, "AES");
-
-            // =========================
-            // 3️⃣ Décrypt Flow Data (AES)
-            // =========================
-            byte[] ivBytes = decodeBase64(ivB64);
-            IvParameterSpec iv = new IvParameterSpec(ivBytes);
-
-            Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            aesCipher.init(Cipher.DECRYPT_MODE, aesKey, iv);
-
-            byte[] decryptedBytes = aesCipher.doFinal(decodeBase64(encryptedFlowData));
-            String decryptedJson = new String(decryptedBytes, StandardCharsets.UTF_8);
-
-            System.out.println("📥 JSON reçu déchiffré : " + decryptedJson);
-
-            Map<String, Object> flowData =
-                    new ObjectMapper().readValue(decryptedJson, Map.class);
-
-            // =========================
-            // 4️⃣ Health Check
-            // =========================
-            if ("ping".equals(flowData.get("action"))) {
-                return ResponseEntity.ok("{\"status\":\"active\"}");
-            }
-
-            // =========================
-            // 5️⃣ Traitement formulaire
-            // =========================
-            String prenom = (String) flowData.getOrDefault("prenom", "Utilisateur");
-
-            Map<String, Object> responsePayload = Map.of(
-                    "screen", "QUESTION_ONE",
-                    "data", Map.of(
-                            "message", "Merci " + prenom + ", votre demande est reçue."
+            rsaCipher.init(
+                    Cipher.DECRYPT_MODE,
+                    getPrivateKey(),
+                    new OAEPParameterSpec(
+                            "SHA-256",
+                            "MGF1",
+                            MGF1ParameterSpec.SHA256,
+                            PSource.PSpecified.DEFAULT
                     )
             );
 
-            String responseJson = new ObjectMapper().writeValueAsString(responsePayload);
+            byte[] aesKey = rsaCipher.doFinal(encryptedAesKey);
 
             // =========================
-            // 6️⃣ Encrypt réponse (AES)
+            // 3️⃣ AES-GCM decrypt payload
             // =========================
-            byte[] newIvBytes = new byte[16];
-            new SecureRandom().nextBytes(newIvBytes);
+            GCMParameterSpec gcmSpec = new GCMParameterSpec(128, iv);
 
-            IvParameterSpec newIv = new IvParameterSpec(newIvBytes);
-            aesCipher.init(Cipher.ENCRYPT_MODE, aesKey, newIv);
-
-            byte[] encryptedResponse =
-                    aesCipher.doFinal(responseJson.getBytes(StandardCharsets.UTF_8));
-
-            String encryptedBase64 =
-                    Base64.getEncoder().encodeToString(encryptedResponse);
-
-            String ivBase64 =
-                    Base64.getEncoder().encodeToString(newIvBytes);
-
-            // =========================
-            // 7️⃣ Retour HTTP 200
-            // =========================
-            String finalResponse = String.format(
-                    "{\"encrypted_flow_data\":\"%s\",\"initial_vector\":\"%s\"}",
-                    encryptedBase64,
-                    ivBase64
+            Cipher aesCipher = Cipher.getInstance("AES/GCM/NoPadding");
+            aesCipher.init(
+                    Cipher.DECRYPT_MODE,
+                    new SecretKeySpec(aesKey, "AES"),
+                    gcmSpec
             );
 
-            return ResponseEntity.ok(finalResponse);
+            byte[] decryptedBytes = aesCipher.doFinal(encryptedFlowData);
+
+            String clearJson = new String(decryptedBytes, StandardCharsets.UTF_8);
+
+            System.out.println("✅ JSON déchiffré = " + clearJson);
+
+            // =========================
+            // 4️⃣ Construire réponse
+            // =========================
+            String clearResponse =
+                    "{\"screen\":\"QUESTION_ONE\",\"data\":{\"message\":\"Demande reçue\"}}";
+
+            // IMPORTANT : flip IV comme dans l'exemple officiel
+            byte[] flippedIv = flipIv(iv);
+
+            GCMParameterSpec responseSpec = new GCMParameterSpec(128, flippedIv);
+
+            aesCipher.init(
+                    Cipher.ENCRYPT_MODE,
+                    new SecretKeySpec(aesKey, "AES"),
+                    responseSpec
+            );
+
+            byte[] encryptedResponse =
+                    aesCipher.doFinal(clearResponse.getBytes(StandardCharsets.UTF_8));
+
+            String base64Response =
+                    Base64.getEncoder().encodeToString(encryptedResponse);
+
+            return ResponseEntity.ok(base64Response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.ok("{\"status\":\"error\",\"message\":\"Erreur traitement Flow"+e.getMessage()+" type "+e.getLocalizedMessage()+" \"}");
+            return ResponseEntity.ok("Erreur traitement Flow : " + e.getMessage());
         }
     }
 
+    private byte[] flipIv(byte[] iv) {
+        byte[] result = new byte[iv.length];
+        for (int i = 0; i < iv.length; i++) {
+            result[i] = (byte) (iv[i] ^ 0xFF);
+        }
+        return result;
+    }
+    
     private String clean(String value) {
         if (value == null) return null;
         return value.replaceAll("\\s", "");
