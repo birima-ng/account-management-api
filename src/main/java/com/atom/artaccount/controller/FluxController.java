@@ -144,6 +144,109 @@ public class FluxController {
         }
     }
 
+    @PostMapping("/reponse-bienvenue")
+    public ResponseEntity<String> reponseFlux(@RequestBody Map<String, String> payload) {
+
+        try {
+
+            // =========================
+            // 1️⃣ Decode Base64
+            // =========================
+            byte[] encryptedFlowData =
+                    Base64.getDecoder().decode(payload.get("encrypted_flow_data"));
+
+            byte[] encryptedAesKey =
+                    Base64.getDecoder().decode(payload.get("encrypted_aes_key"));
+
+            byte[] iv =
+                    Base64.getDecoder().decode(payload.get("initial_vector"));
+
+            // =========================
+            // 2️⃣ RSA decrypt AES key
+            // =========================
+            Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+
+            rsaCipher.init(
+                    Cipher.DECRYPT_MODE,
+                    getPrivateKey(),
+                    new OAEPParameterSpec(
+                            "SHA-256",
+                            "MGF1",
+                            MGF1ParameterSpec.SHA256,
+                            PSource.PSpecified.DEFAULT
+                    )
+            );
+
+            byte[] aesKey = rsaCipher.doFinal(encryptedAesKey);
+
+            // =========================
+            // 3️⃣ AES-GCM decrypt payload
+            // =========================
+            GCMParameterSpec gcmSpec = new GCMParameterSpec(128, iv);
+
+            Cipher aesCipher = Cipher.getInstance("AES/GCM/NoPadding");
+            aesCipher.init(
+                    Cipher.DECRYPT_MODE,
+                    new SecretKeySpec(aesKey, "AES"),
+                    gcmSpec
+            );
+
+            byte[] decryptedBytes = aesCipher.doFinal(encryptedFlowData);
+
+            String clearJson = new String(decryptedBytes, StandardCharsets.UTF_8);
+
+            System.out.println("✅ JSON déchiffré = " + clearJson);
+
+            // =========================
+            // 4️⃣ Construire réponse
+            // =========================
+            /*String clearResponse =
+                    "{\"screen\":\"QUESTION_ONE\",\"data\":{\"message\":\"Demande reçue\"}}";*/
+            
+            Map<String, Object> request =
+            	    new ObjectMapper().readValue(clearJson, Map.class);
+
+            	String action = (String) request.get("action");
+            	String clearResponse;
+
+            	if ("ping".equals(action)) {
+
+            	    clearResponse = "{\"data\":{\"status\":\"active\"}}";
+
+            	} else if ("complete".equals(action)) {
+
+            	    clearResponse = "{\"screen\":\"SUCCESS\",\"data\":{}}";
+
+            	} else {
+
+            	    clearResponse = "{\"screen\":\"SUCCESS\",\"data\":{}}";
+            	}
+
+            // IMPORTANT : flip IV comme dans l'exemple officiel
+            byte[] flippedIv = flipIv(iv);
+
+            GCMParameterSpec responseSpec = new GCMParameterSpec(128, flippedIv);
+
+            aesCipher.init(
+                    Cipher.ENCRYPT_MODE,
+                    new SecretKeySpec(aesKey, "AES"),
+                    responseSpec
+            );
+
+            byte[] encryptedResponse =
+                    aesCipher.doFinal(clearResponse.getBytes(StandardCharsets.UTF_8));
+
+            String base64Response =
+                    Base64.getEncoder().encodeToString(encryptedResponse);
+
+            return ResponseEntity.ok(base64Response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok("Erreur traitement Flow : " + e.getMessage()+" "+pem1);
+        }
+    }
+    
     private byte[] flipIv(byte[] iv) {
         byte[] result = new byte[iv.length];
         for (int i = 0; i < iv.length; i++) {
