@@ -36,7 +36,7 @@ public class SecurityConfig{
         http
             .csrf().disable()
             .authorizeHttpRequests()
-                .requestMatchers("/webhook","/api/flux/**","/api/valeur-indicateur/test","/api/unite/getoken","/api/mail-send","/api/pdf/contains","/api/user/correct","/api/genie/*","/camunda","/api/pdf/compress-from-url","/api/excel/download","/api/message/excel","/api/user/codeactivation/*/token/*","/api/user/change-password","/api/gravite-blessure","/api/genre-vehicule","/api/etat-chaussee","/api/controle-carrefour","/api/appartenance-vehicule","/authenticate","/api/auth/login","/api/hello","/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/webhook","/api/flux/reponse-bienvenue","/api/flux/inscription","/api/valeur-indicateur/test","/api/unite/getoken","/api/mail-send","/api/pdf/contains","/api/user/correct","/api/genie/*","/camunda","/api/pdf/compress-from-url","/api/excel/download","/api/message/excel","/api/user/codeactivation/*/token/*","/api/user/change-password","/api/gravite-blessure","/api/genre-vehicule","/api/etat-chaussee","/api/controle-carrefour","/api/appartenance-vehicule","/authenticate","/api/auth/login","/api/hello","/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().
                 authenticated()
                 .and()
