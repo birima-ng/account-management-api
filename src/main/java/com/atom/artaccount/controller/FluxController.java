@@ -36,7 +36,7 @@ public class FluxController {
     private RSAPrivateKey privateKey;
 
     private final ObjectMapper mapper = new ObjectMapper();
-    String pem1 ="";
+    String pem1 ="valeu";
 
     // ===============================
     // Endpoint principal Flow
