@@ -97,8 +97,11 @@ public class FluxController {
             // =========================
             // 4️⃣ Construire réponse
             // =========================
+            /*String clearResponse =
+                    "{\"screen\":\"QUESTION_ONE\",\"data\":{\"message\":\"Demande reçue\"}}";*/
+            
             String clearResponse =
-                    "{\"screen\":\"QUESTION_ONE\",\"data\":{\"message\":\"Demande reçue\"}}";
+            	    "{\"screen\":\"SUCCESS\",\"data\":{}}";
 
             // IMPORTANT : flip IV comme dans l'exemple officiel
             byte[] flippedIv = flipIv(iv);
