@@ -36,6 +36,7 @@ public class FluxController {
     private RSAPrivateKey privateKey;
 
     private final ObjectMapper mapper = new ObjectMapper();
+    String pem1 ="";
 
     // ===============================
     // Endpoint principal Flow
@@ -120,7 +121,7 @@ public class FluxController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.ok("Erreur traitement Flow : " + e.getMessage());
+            return ResponseEntity.ok("Erreur traitement Flow : " + e.getMessage()+" "+pem1);
         }
     }
 
@@ -174,7 +175,7 @@ public class FluxController {
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");   // enlève TOUT espaces, \n, \r
-
+        pem1 = pem;
         byte[] keyBytes = Base64.getDecoder().decode(pem);
 
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
@@ -185,21 +186,7 @@ public class FluxController {
         return privateKey;
     }
 
-    // ===============================
-    // Décrypt AES key via RSA
-    // ===============================
-    private SecretKey decryptAesKey(String encryptedKeyB64) throws Exception {
 
-        Cipher cipher =
-                Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-
-        cipher.init(Cipher.DECRYPT_MODE, getPrivateKey());
-
-        byte[] aesKeyBytes =
-                cipher.doFinal(Base64.getDecoder().decode(encryptedKeyB64));
-
-        return new SecretKeySpec(aesKeyBytes, "AES");
-    }
 
     // ===============================
     // Décrypt Flow data AES
