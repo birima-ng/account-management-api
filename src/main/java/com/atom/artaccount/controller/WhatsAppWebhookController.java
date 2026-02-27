@@ -93,16 +93,19 @@ public class WhatsAppWebhookController {
                         if ("interactive".equals(type)) {
                         	
                         	 Map<String,Object> interactive = (Map<String,Object>) payload.get("interactive");
+                        	 
+                        	 
+                        	  Message message3 = new Message();
+                              message3.setTelephone(from);
+                              message3.setMessage("type "+type+" valeur "+interactive.get("type"));
+                              message3.setWabaid(wabaId);
+                              message3.setPhonenumberid(phoneNumberId);
+                             
+                              messageService.createMessage(message3);
                              if(interactive != null && "button_reply".equals(interactive.get("type"))) {
                                  String buttonId = ((Map<String,String>)interactive.get("button_reply")).get("id");
 
-                                 Message message3 = new Message();
-                                 message3.setTelephone(from);
-                                 message3.setMessage("type "+type+" valeur "+buttonId);
-                                 message3.setWabaid(wabaId);
-                                 message3.setPhonenumberid(phoneNumberId);
-                                
-                                 messageService.createMessage(message3);
+                               
                                  
                                  // Réagir selon l'option choisie
                                  switch(buttonId) {
