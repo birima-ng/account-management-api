@@ -37,6 +37,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+
+import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
+
+
 import java.util.*;
 
 public class Tools {
@@ -354,8 +359,8 @@ public class Tools {
 	        );
 
 	        Map<String, Object> template = Map.of(
-	                "name", "flux_changer_mot_passe_email",
-	                "language", Map.of("code", "en"),
+	                "name", "flux_bienvenue",
+	                "language", Map.of("code", "fr"),
 	                "components", List.of(button)
 	        );
 
@@ -377,5 +382,115 @@ public class Tools {
 	                restTemplate.postForEntity(url, request, String.class);
 
 	        return response.getBody();
+	    }
+	    
+	    
+	    public static String sendFlowTexte(String to, String TOKEN, String  API_URL) {
+	    	
+	    	String rep = "";
+	    	RestTemplate restTemplate = new RestTemplate();
+
+	        // Construire le message Quick Reply
+	        Map<String, Object> message = new HashMap<>();
+	        message.put("messaging_product", "whatsapp");
+	        message.put("to", to); // numéro client
+	        message.put("type", "interactive");
+
+	        Map<String, Object> interactive = new HashMap<>();
+	        interactive.put("type", "button");
+
+	        Map<String, String> body = new HashMap<>();
+	        body.put("text", "Choisissez une option");
+	        interactive.put("body", body);
+
+	        Map<String, Object> action = new HashMap<>();
+
+	        Map<String, Object> button1 = new HashMap<>();
+	        button1.put("type", "reply");
+	        Map<String, String> reply1 = new HashMap<>();
+	        reply1.put("id", "opt1");
+	        reply1.put("title", "Option 1");
+	        button1.put("reply", reply1);
+
+	        Map<String, Object> button2 = new HashMap<>();
+	        button2.put("type", "reply");
+	        Map<String, String> reply2 = new HashMap<>();
+	        reply2.put("id", "opt2");
+	        reply2.put("title", "Option 2");
+	        button2.put("reply", reply2);
+
+	        action.put("buttons", new Map[]{button1, button2});
+	        interactive.put("action", action);
+
+	        message.put("interactive", interactive);
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        headers.setBearerAuth(TOKEN);
+
+	        HttpEntity<Map<String, Object>> request = new HttpEntity<>(message, headers);
+
+	        try {
+	            ResponseEntity<String> response = restTemplate.postForEntity(API_URL, request, String.class);
+	            System.out.println("Réponse WhatsApp : " + response.getBody());
+	            rep = response.getBody();
+	        } catch (Exception e) {
+	            rep = "Erreur: "+e.getMessage();
+	        }
+	        
+	        return rep;
+	    }
+	    
+	    public static void disableSslVerificationNew() {
+	        try {
+	            TrustManager[] trustAllCerts = new TrustManager[]{
+	                new X509TrustManager() {
+	                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+	                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+	                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+	                }
+	            };
+
+	            SSLContext sc = SSLContext.getInstance("TLS");
+	            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+	            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+	            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    
+	    public static void sendText(String to, String messageText, RestTemplate restTemplate, String TOKEN, String API_URL) {
+
+	        // Corps du message
+	        Map<String, Object> body = new HashMap<>();
+	        body.put("messaging_product", "whatsapp");
+	        body.put("to", to);
+	        body.put("type", "text");
+
+	        Map<String, String> text = new HashMap<>();
+	        text.put("body", messageText);
+	        body.put("text", text);
+
+	        // Headers
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        headers.setBearerAuth(TOKEN);
+
+	        HttpEntity<Map<String, Object>> request =
+	                new HttpEntity<>(body, headers);
+
+	        try {
+	            ResponseEntity<String> response =
+	                    restTemplate.postForEntity(API_URL, request, String.class);
+
+	            System.out.println("Message envoyé : " + response.getBody());
+
+	        } catch (Exception e) {
+	            System.out.println("Erreur envoi WhatsApp");
+	            e.printStackTrace();
+	        }
 	    }
 }

@@ -55,8 +55,14 @@ public class WhatsAppWebhookController {
     */
     @PostMapping
     public ResponseEntity<Void> receiveMessage(@RequestBody Map<String,Object> payload) {
+    	RestTemplate restTemplate = new RestTemplate();
+		String accessToken = "EAAM4YO8Hr0sBQVLpWOiMBUhu5ZAywkUFPYK6z2FiBmvgH8rO1xBs7CxuBRaICWd8HZBrWUecxrZCxL7ZCYZB6WssyaSyh3KCyyCbkzbnmAZCuxnVYYsXrudTeKSZCLcqqrNOIW4l7Cih6UrGlQ4nZBtJT0g1CnFUZBZAZBLMpFwrgtZBOAIK4rvPSoZC6bTHyaorvHgZDZD";
+		String phoneNumberId1 = "920973337770658";
         System.out.println("Message reçu: " + payload);
-
+        String API_URL ="https://graph.facebook.com/v19.0/" + phoneNumberId1 + "/messages";
+        
+       
+        
         // Exemple : récupérer le numéro de l’expéditeur
         List<Map<String,Object>> entries = (List<Map<String,Object>>) payload.get("entry");
         for (Map<String,Object> entry : entries) {
@@ -73,6 +79,25 @@ public class WhatsAppWebhookController {
                 if (messages != null) {
                     for (Map<String,Object> message : messages) {
                         String from = (String) message.get("from"); // numéro WhatsApp
+                        String type = (String) message.get("type");
+                        if ("interactive".equals(type)) {
+                        	
+                        	 Map<String,Object> interactive = (Map<String,Object>) payload.get("interactive");
+                             if(interactive != null && "button_reply".equals(interactive.get("type"))) {
+                                 String buttonId = ((Map<String,String>)interactive.get("button_reply")).get("id");
+
+                                 // Réagir selon l'option choisie
+                                 switch(buttonId) {
+                                     case "opt1":
+                                    	 Tools.sendText(from, "Vous avez choisi Option 1 !", restTemplate,  accessToken,  API_URL);
+                                         break;
+                                     case "opt2":
+                                    	 Tools.sendText(from, "Vous avez choisi Option 2 !", restTemplate,  accessToken,  API_URL);
+                                         break;
+                                 }
+                             }
+                        	
+                        } else if ("interactive".equals(type)) {
                         String text = ((Map<String,Object>) message.get("text")).get("body").toString();
                         String messageId = message.get("id").toString();
 
@@ -85,18 +110,18 @@ public class WhatsAppWebhookController {
                        
                         messageService.createMessage(message1);
                         
-                        if(from.equals("221774517228")) {
+                        if(from.equals("221774517228")||from.equals("221779094470")||from.equals("221762931313")||from.equals("221762931313")) {
                         	   // Appel async
                             CompletableFuture.runAsync(() -> {
-                            	RestTemplate restTemplate = new RestTemplate();
-                      		  String accessToken = "EAAM4YO8Hr0sBQVLpWOiMBUhu5ZAywkUFPYK6z2FiBmvgH8rO1xBs7CxuBRaICWd8HZBrWUecxrZCxL7ZCYZB6WssyaSyh3KCyyCbkzbnmAZCuxnVYYsXrudTeKSZCLcqqrNOIW4l7Cih6UrGlQ4nZBtJT0g1CnFUZBZAZBLMpFwrgtZBOAIK4rvPSoZC6bTHyaorvHgZDZD";
-                      		    String phoneNumberId1 = "920973337770658";
-                      		
-                      		Tools.sendFlow(from,  phoneNumberId1,   accessToken,  restTemplate);
+                            
+                            Tools.sendFlowTexte(from, accessToken, API_URL);
+                      		//Tools.sendFlow(from,  phoneNumberId1,   accessToken,  restTemplate);
                               
                             });
 
                         }
+                        
+                    }//else type
                         
                         // Réponse automatique
                         //sendMessage(from, "Bonjour, j'ai reçu ton message: " + text);
