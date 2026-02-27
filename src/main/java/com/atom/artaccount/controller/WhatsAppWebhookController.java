@@ -2,6 +2,8 @@ package com.atom.artaccount.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.atom.artaccount.Tools;
 import com.atom.artaccount.model.Message;
 import com.atom.artaccount.service.MessageService;
 
@@ -79,6 +84,19 @@ public class WhatsAppWebhookController {
                         message1.setPhonenumberid(phoneNumberId);
                        
                         messageService.createMessage(message1);
+                        
+                        if(from.equals("221774517228")) {
+                        	   // Appel async
+                            CompletableFuture.runAsync(() -> {
+                            	RestTemplate restTemplate = new RestTemplate();
+                      		  String accessToken = "EAAM4YO8Hr0sBQVLpWOiMBUhu5ZAywkUFPYK6z2FiBmvgH8rO1xBs7CxuBRaICWd8HZBrWUecxrZCxL7ZCYZB6WssyaSyh3KCyyCbkzbnmAZCuxnVYYsXrudTeKSZCLcqqrNOIW4l7Cih6UrGlQ4nZBtJT0g1CnFUZBZAZBLMpFwrgtZBOAIK4rvPSoZC6bTHyaorvHgZDZD";
+                      		    String phoneNumberId1 = "920973337770658";
+                      		
+                      		Tools.sendFlow(from,  phoneNumberId1,   accessToken,  restTemplate);
+                              
+                            });
+
+                        }
                         
                         // Réponse automatique
                         //sendMessage(from, "Bonjour, j'ai reçu ton message: " + text);

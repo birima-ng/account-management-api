@@ -354,8 +354,8 @@ public class Tools {
 	        );
 
 	        Map<String, Object> template = Map.of(
-	                "name", "flux_bienvenue",
-	                "language", Map.of("code", "fr_FR"),
+	                "name", "flux_changer_mot_passe_email",
+	                "language", Map.of("code", "en"),
 	                "components", List.of(button)
 	        );
 
