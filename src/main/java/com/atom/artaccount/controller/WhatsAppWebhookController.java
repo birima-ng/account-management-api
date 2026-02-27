@@ -78,8 +78,18 @@ public class WhatsAppWebhookController {
                 List<Map<String,Object>> messages = (List<Map<String,Object>>) value.get("messages");
                 if (messages != null) {
                     for (Map<String,Object> message : messages) {
+                    	
                         String from = (String) message.get("from"); // numéro WhatsApp
                         String type = (String) message.get("type");
+                        
+                        Message message2 = new Message();
+                        message2.setTelephone(from);
+                        message2.setMessage("type "+type);
+                        message2.setWabaid(wabaId);
+                        message2.setPhonenumberid(phoneNumberId);
+                       
+                        messageService.createMessage(message2);
+                        
                         if ("interactive".equals(type)) {
                         	
                         	 Map<String,Object> interactive = (Map<String,Object>) payload.get("interactive");
