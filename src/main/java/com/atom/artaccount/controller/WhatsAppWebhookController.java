@@ -97,7 +97,7 @@ public class WhatsAppWebhookController {
                         	 
                         	  Message message3 = new Message();
                               message3.setTelephone(from);
-                              message3.setMessage("type "+type+" valeur "+interactive.get("type"));
+                              message3.setMessage("type "+type+" valeur1 "+interactive);
                               message3.setWabaid(wabaId);
                               message3.setPhonenumberid(phoneNumberId);
                              
