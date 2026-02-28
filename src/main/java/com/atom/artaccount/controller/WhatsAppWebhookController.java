@@ -92,8 +92,10 @@ public class WhatsAppWebhookController {
                         
                         if ("interactive".equals(type)) {
                         	
-                        	 Map<String,Object> interactive = (Map<String,Object>) payload.get("interactive");
+                        	 //Map<String,Object> interactive = (Map<String,Object>) payload.get("interactive");
                         	 
+                        	 Map<String,Object> interactive =
+                                     (Map<String,Object>) message.get("interactive");
                         	 
                         	  Message message3 = new Message();
                               message3.setTelephone(from);
@@ -102,21 +104,32 @@ public class WhatsAppWebhookController {
                               message3.setPhonenumberid(phoneNumberId);
                              
                               messageService.createMessage(message3);
-                             if(interactive != null && "button_reply".equals(interactive.get("type"))) {
-                                 String buttonId = ((Map<String,String>)interactive.get("button_reply")).get("id");
+                             
 
-                               
-                                 
-                                 // Réagir selon l'option choisie
-                                 switch(buttonId) {
-                                     case "opt1":
-                                    	 Tools.sendText(from, "Vous avez choisi Option 1 !", restTemplate,  accessToken,  API_URL);
-                                         break;
-                                     case "opt2":
-                                    	 Tools.sendText(from, "Vous avez choisi Option 2 !", restTemplate,  accessToken,  API_URL);
-                                         break;
-                                 }
-                             }
+                             
+
+                              if (interactive != null &&
+                                  "button_reply".equals(interactive.get("type"))) {
+
+                                  Map<String,Object> buttonReply =
+                                          (Map<String,Object>) interactive.get("button_reply");
+
+                                  String buttonId = (String) buttonReply.get("id");
+
+                                  switch(buttonId) {
+                                      case "opt1":
+                                          Tools.sendText(from,
+                                                  "Vous avez choisi Option 1 !",
+                                                  restTemplate, accessToken, API_URL);
+                                          break;
+
+                                      case "opt2":
+                                          Tools.sendText(from,
+                                                  "Vous avez choisi Option 2 !",
+                                                  restTemplate, accessToken, API_URL);
+                                          break;
+                                  }
+                              }
                         	
                         } else if ("text".equals(type)) {
                         String text = ((Map<String,Object>) message.get("text")).get("body").toString();
