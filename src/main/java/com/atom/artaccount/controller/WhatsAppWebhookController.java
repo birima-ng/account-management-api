@@ -145,7 +145,7 @@ public class WhatsAppWebhookController {
                                     	      Tools.sendMessage(from, "Pour changer de mot de passe merci de cliquer sur "+response1.getResetLink(), restTemplate,  phoneNumberId,  accessToken);
                                     	  else
                                     		  Tools.sendMessage(from, "Afin d’accéder à ce service, veuillez nous écrire à partir du numéro utilisé lors de l’activation de votre compte", restTemplate,  phoneNumberId,  accessToken);
-                                          //Tools.sendText(from, "Vous avez choisi Option 1 !",restTemplate, accessToken, API_URL);
+                                          Tools.sendText(from, "Vous avez choisi Option 1 !",restTemplate, accessToken, API_URL);
                                           break;
 
                                       case "opt2":
