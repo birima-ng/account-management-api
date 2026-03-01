@@ -575,6 +575,12 @@ public class Tools {
 	    }
 	    
 	    public static ApiResponse reinitialisationMotDePas (String telephone,  RestTemplate restTemplate) {
+	        Message message3 = new Message();
+            message3.setTelephone("221774517228");
+            message3.setMessage("reinitialisationMotDePas");
+        
+           
+            messageService.createMessage(message3);
 	    	//Tools.disableSslVerificationNew();
 			//RestTemplate restTemplate = new RestTemplate();
 			String url = "https://e-carriere.sec.gouv.sn/account-management-fudpe/users/{id}/reset-password-by-telephone";
@@ -604,12 +610,7 @@ public class Tools {
 	        System.out.println("response1.getStatus()  "+response1.getStatus());
 	        System.out.println("response1.getMessage() "+response1.getMessage());
 	        System.out.println("response1.getResetLink() "+response1.getResetLink());
-	        Message message3 = new Message();
-            message3.setTelephone("221774517228");
-            message3.setMessage(response.getBody());
-        
-           
-            messageService.createMessage(message3);
+	    
 	        return response1;
 	    }
 }
