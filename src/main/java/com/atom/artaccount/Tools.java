@@ -579,7 +579,7 @@ public class Tools {
 			String phoneNumberId1 = "920973337770658";
 			String API_URL ="https://graph.facebook.com/v19.0/" + phoneNumberId1 + "/messages";
 	    	 Tools.sendText(telephone, "Vous avez choisi Option 11 !",restTemplate, accessToken, API_URL);
-	    	//Tools.disableSslVerificationNew();
+	    	Tools.disableSslVerificationNew();
 			//RestTemplate restTemplate = new RestTemplate();
 			String url = "https://e-carriere.sec.gouv.sn/account-management-fudpe/users/{id}/reset-password-by-telephone";
 			restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
@@ -588,6 +588,7 @@ public class Tools {
 			        return false; // Désactive les exceptions automatiques
 			    }
 			});
+			 Tools.sendText(telephone, "Vous avez choisi Option 12 ! ",restTemplate, accessToken, API_URL);
 	        HttpEntity<Void> request = new HttpEntity<>(null);
 
 	        ResponseEntity<String> response = restTemplate.exchange(
