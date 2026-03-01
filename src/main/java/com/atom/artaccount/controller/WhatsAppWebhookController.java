@@ -96,8 +96,6 @@ public class WhatsAppWebhookController {
                              message2.setTelephone(from);
                              message2.setWabaid(wabaId);
                              message2.setPhonenumberid(phoneNumberId);
-
-                             
                              
                         	 //Map<String,Object> interactive = (Map<String,Object>) payload.get("interactive");
                         	 
@@ -129,6 +127,7 @@ public class WhatsAppWebhookController {
                                       case "opt1":
                                     	  message2.setMessage("opt1");
                                           messageService.createMessage(message2);
+                                          
                                     	  String num = Tools.removeCountryCode(from);
                                     	  
                                     	  response1 =  Tools.reinitialisationMotDePas (num);
