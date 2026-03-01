@@ -53,6 +53,8 @@ public class TestWhatsapp {
         System.out.println("Body: " + response.getBody());*/
 		
 		Tools.sendFlowTexte("774517228", accessToken, API_URL);
+		
+		//Tools.sendWelcomeMessage("774517228",  restTemplate,  phoneNumberId,  accessToken);
 
 		/*try {
 			//Tools.envoyerTemplate("774517228", "Ttest");

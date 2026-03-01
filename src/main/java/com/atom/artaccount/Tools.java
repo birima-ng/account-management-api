@@ -404,20 +404,31 @@ public class Tools {
 	        interactive.put("body", body);
 
 	        Map<String, Object> action = new HashMap<>();
+	        
+	        
 
 	        Map<String, Object> button1 = new HashMap<>();
 	        button1.put("type", "reply");
 	        Map<String, String> reply1 = new HashMap<>();
 	        reply1.put("id", "opt1");
-	        reply1.put("title", "Option 1");
+	        reply1.put("title", "Mot de passe oublié");
 	        button1.put("reply", reply1);
 
 	        Map<String, Object> button2 = new HashMap<>();
 	        button2.put("type", "reply");
 	        Map<String, String> reply2 = new HashMap<>();
 	        reply2.put("id", "opt2");
-	        reply2.put("title", "Option 2");
+	        reply2.put("title", "Compte E-Carriere");
 	        button2.put("reply", reply2);
+	        
+	        Map<String, Object> button3 = new HashMap<>();
+	        button3.put("type", "reply");
+	        
+	        /*Map<String, String> reply3 = new HashMap<>();
+	        reply3.put("id", "opt3");
+	        reply3.put("title", "Activation compte");
+	        button3.put("reply", reply3);*/
+	        
 
 	        action.put("buttons", new Map[]{button1, button2});
 	        interactive.put("action", action);
@@ -492,5 +503,42 @@ public class Tools {
 	            System.out.println("Erreur envoi WhatsApp");
 	            e.printStackTrace();
 	        }
+	    }
+	    
+	    public static void sendWelcomeMessage(String to, RestTemplate restTemplate, String phoneNumberId, String accessToken) {
+
+	        String url = "https://graph.facebook.com/v19.0/" + phoneNumberId + "/messages";
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setBearerAuth(accessToken);
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+
+	        String body = """
+	        {
+	          "messaging_product": "whatsapp",
+	          "to": "%s",
+	          "type": "text",
+	          "text": {
+	            "body": "Bonjour 👋\\n\\nBienvenue au support technique. Pour une assistance plus rapide, veuillez nous contacter par message en utilisant le numéro de téléphone associé à votre compte  E-Carriere😊"
+	          }
+	        }
+	        """.formatted(to);
+
+	        HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+	        restTemplate.postForEntity(url, request, String.class);
+	    }
+	    
+	    public static String removeCountryCode(String phone) {
+
+	        if (phone == null) return null;
+
+	        phone = phone.replace("+", "");
+
+	        if (phone.startsWith("221")) {
+	            return phone.substring(3);
+	        }
+
+	        return phone;
 	    }
 }

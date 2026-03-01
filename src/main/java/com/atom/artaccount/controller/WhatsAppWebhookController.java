@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.atom.artaccount.Tools;
 import com.atom.artaccount.model.Message;
+import com.atom.artaccount.service.MessageBienvenueService;
 import com.atom.artaccount.service.MessageService;
 
 @RestController
@@ -27,6 +28,10 @@ public class WhatsAppWebhookController {
    
     @Autowired
     private MessageService messageService;
+    
+    @Autowired
+    private MessageBienvenueService messagebienvenueService;
+    
     // Vérification du webhook
     @GetMapping
     public ResponseEntity<String> verify(
@@ -82,28 +87,29 @@ public class WhatsAppWebhookController {
                         String from = (String) message.get("from"); // numéro WhatsApp
                         String type = (String) message.get("type");
                         
-                        Message message2 = new Message();
-                        message2.setTelephone(from);
-                        message2.setMessage("type "+type);
-                        message2.setWabaid(wabaId);
-                        message2.setPhonenumberid(phoneNumberId);
                        
-                        messageService.createMessage(message2);
                         
                         if ("interactive".equals(type)) {
                         	
+                        	 Message message2 = new Message();
+                             message2.setTelephone(from);
+                             message2.setWabaid(wabaId);
+                             message2.setPhonenumberid(phoneNumberId);
+
+                             
+                             
                         	 //Map<String,Object> interactive = (Map<String,Object>) payload.get("interactive");
                         	 
                         	 Map<String,Object> interactive =
                                      (Map<String,Object>) message.get("interactive");
                         	 
-                        	  Message message3 = new Message();
+                        	  /*Message message3 = new Message();
                               message3.setTelephone(from);
                               message3.setMessage("type "+type+" valeur1 "+interactive);
                               message3.setWabaid(wabaId);
                               message3.setPhonenumberid(phoneNumberId);
                              
-                              messageService.createMessage(message3);
+                              messageService.createMessage(message3);*/
                              
 
                              
@@ -118,12 +124,17 @@ public class WhatsAppWebhookController {
 
                                   switch(buttonId) {
                                       case "opt1":
+                                    	  message2.setMessage("opt1");
+                                          messageService.createMessage(message2);
+                                    	  Tools.removeCountryCode(from);
                                           Tools.sendText(from,
                                                   "Vous avez choisi Option 1 !",
                                                   restTemplate, accessToken, API_URL);
                                           break;
 
                                       case "opt2":
+                                    	  message2.setMessage("opt2");
+                                          messageService.createMessage(message2);
                                           Tools.sendText(from,
                                                   "Vous avez choisi Option 2 !",
                                                   restTemplate, accessToken, API_URL);
@@ -147,6 +158,11 @@ public class WhatsAppWebhookController {
                         if(from.equals("221774517228")||from.equals("221779094470")||from.equals("221762931313")||from.equals("221762931313")) {
                         	   // Appel async
                             CompletableFuture.runAsync(() -> {
+                            boolean result = messagebienvenueService.existsToday(from);
+                            
+                            if(!result) {
+                            	Tools.sendWelcomeMessage(from,  restTemplate, phoneNumberId, accessToken);
+                            }
                             
                             Tools.sendFlowTexte(from, accessToken, API_URL);
                       		//Tools.sendFlow(from,  phoneNumberId1,   accessToken,  restTemplate);
