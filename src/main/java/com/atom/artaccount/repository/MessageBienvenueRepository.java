@@ -12,7 +12,7 @@ import com.atom.artaccount.model.MessageBienvenue;
 public interface MessageBienvenueRepository extends JpaRepository<MessageBienvenue, String>, JpaSpecificationExecutor<MessageBienvenue> {
 	//boolean existsByLibelle(int libelle);
 	//Optional<Annee> findByLibelle(int libelle);
-	@Query("SELECT a FROM MessageBienvenue a WHERE a.telephone=:telephone AND a.datesave BETWEEN :start AND :end")
+	@Query("SELECT a FROM message_bienvenue a WHERE a.telephone  = :telephone AND a.datesave BETWEEN :start AND :end")
 	List<MessageBienvenue> findToday(
 	        @Param("start") Date start,
 	        @Param("end") Date end,  @Param("telephone") String telephone
