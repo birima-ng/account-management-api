@@ -123,14 +123,18 @@ public class WhatsAppWebhookController {
 
                                   ApiResponse response1;
                                   
+                                 
+                                  
 								switch(buttonId) {
                                       case "opt1":
-                                    	  message2.setMessage("opt1");
-                                          messageService.createMessage(message2);
                                           
                                     	  String num = Tools.removeCountryCode(from);
                                     	  
                                     	  response1 =  Tools.reinitialisationMotDePas (num);
+                                    	  
+                                    	  message2.setMessage(""+response1.getStatus()+" | num "+num);
+                                          messageService.createMessage(message2);
+                                          
                                     	  
                                     	  if(response1.getStatus()==200)
                                     	      Tools.sendMessage(from, "Pour changer de mot de passe merci de cliquer sur "+response1.getResetLink(), restTemplate,  phoneNumberId,  accessToken);
