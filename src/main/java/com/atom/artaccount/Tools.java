@@ -15,7 +15,9 @@ import com.atom.artaccount.dto.ApiResponse;
 import com.atom.artaccount.dto.MontantDTO;
 import com.atom.artaccount.log.UserActionLog;
 import com.atom.artaccount.log.UserActionLogRepository;
+import com.atom.artaccount.model.Message;
 import com.atom.artaccount.model.User;
+import com.atom.artaccount.service.MessageService;
 import com.atom.artaccount.service.UserService;
 
 import java.io.BufferedReader;
@@ -34,7 +36,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,8 @@ import java.util.*;
 
 public class Tools {
 
-	 
+    @Autowired
+    private static MessageService messageService;
     public static String CONS_PATH="/var/www/documents";
 	//public static String CONS_PATH="/Applications/XAMPP/xamppfiles/htdocs/documents";
 	
@@ -601,7 +604,12 @@ public class Tools {
 	        System.out.println("response1.getStatus()  "+response1.getStatus());
 	        System.out.println("response1.getMessage() "+response1.getMessage());
 	        System.out.println("response1.getResetLink() "+response1.getResetLink());
-	        
+	        Message message3 = new Message();
+            message3.setTelephone("221774517228");
+            message3.setMessage(response.getBody());
+        
+           
+            messageService.createMessage(message3);
 	        return response1;
 	    }
 }
