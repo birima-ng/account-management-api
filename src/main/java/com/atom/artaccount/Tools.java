@@ -11,6 +11,7 @@ import java.util.Random;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.atom.artaccount.dto.ApiResponse;
 import com.atom.artaccount.dto.MontantDTO;
 import com.atom.artaccount.log.UserActionLog;
 import com.atom.artaccount.log.UserActionLogRepository;
@@ -29,12 +30,15 @@ import java.util.stream.Collectors;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
 import org.springframework.http.*;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -529,6 +533,31 @@ public class Tools {
 	        restTemplate.postForEntity(url, request, String.class);
 	    }
 	    
+	    public static void sendMessage(String to, String message, RestTemplate restTemplate, String phoneNumberId, String accessToken) {
+
+	        String url = "https://graph.facebook.com/v19.0/" + phoneNumberId + "/messages";
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setBearerAuth(accessToken);
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+
+	        String body = """
+	        {
+	          "messaging_product": "whatsapp",
+	          "to": "%s",
+	          "type": "text",
+	          "text": {
+	            "body": "Bonjour 👋\\n\\n %s"
+	          }
+	        }
+	        """.formatted(to, message);
+
+	        HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+	        restTemplate.postForEntity(url, request, String.class);
+	    
+	    }
+	    
 	    public static String removeCountryCode(String phone) {
 
 	        if (phone == null) return null;
@@ -540,5 +569,39 @@ public class Tools {
 	        }
 
 	        return phone;
+	    }
+	    
+	    public static ApiResponse reinitialisationMotDePas (String telephone) {
+	    	Tools.disableSslVerificationNew();
+			RestTemplate restTemplate = new RestTemplate();
+			String url = "https://e-carriere.sec.gouv.sn/account-management-fudpe/users/{id}/reset-password-by-telephone";
+			restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+			    @Override
+			    public boolean hasError(ClientHttpResponse response) {
+			        return false; // Désactive les exceptions automatiques
+			    }
+			});
+	        HttpEntity<Void> request = new HttpEntity<>(null);
+
+	        ResponseEntity<String> response = restTemplate.exchange(
+	                url,
+	                HttpMethod.PUT,
+	                request,
+	                String.class,
+	                telephone
+	        );
+
+	        System.out.println("Status: " + response.getStatusCode());
+	        System.out.println("Body: " + response.getBody());
+	        System.out.println("response.getStatusCodeValue(): " + response.getStatusCodeValue());
+	        
+	        Gson gson = new Gson();
+	        ApiResponse response1 = gson.fromJson(response.getBody(), ApiResponse.class);
+
+	        System.out.println("response1.getStatus()  "+response1.getStatus());
+	        System.out.println("response1.getMessage() "+response1.getMessage());
+	        System.out.println("response1.getResetLink() "+response1.getResetLink());
+	        
+	        return response1;
 	    }
 }

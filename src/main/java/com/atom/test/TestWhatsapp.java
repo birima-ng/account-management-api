@@ -11,6 +11,8 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import com.atom.artaccount.Tools;
+import com.atom.artaccount.dto.ApiResponse;
+import com.google.gson.Gson;
 
 public class TestWhatsapp {
 
@@ -32,7 +34,7 @@ public class TestWhatsapp {
         //RestTemplate restTemplate = new RestTemplate();
 
        // String url = "http://localhost:8080/api/users/{id}";
-/*
+
 		restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
 		    @Override
 		    public boolean hasError(ClientHttpResponse response) {
@@ -46,15 +48,26 @@ public class TestWhatsapp {
                 HttpMethod.PUT,
                 request,
                 String.class,
-                "77451722844"
+                "774517228"
         );
 
         System.out.println("Status: " + response.getStatusCode());
-        System.out.println("Body: " + response.getBody());*/
+        System.out.println("Body: " + response.getBody());
+        System.out.println("response.getStatusCodeValue(): " + response.getStatusCodeValue());
+        
+        Gson gson = new Gson();
+        ApiResponse response1 = gson.fromJson(response.getBody(), ApiResponse.class);
+
+        System.out.println("response1.getStatus()  "+response1.getStatus());
+        System.out.println("response1.getMessage() "+response1.getMessage());
+        System.out.println("response1.getResetLink() "+response1.getResetLink());
+        
+        Tools.sendMessage("774517228", response1.getResetLink(), restTemplate,  phoneNumberId,  accessToken);
+        
 		
-		Tools.sendFlowTexte("774517228", accessToken, API_URL);
+		//Tools.sendFlowTexte("774517228", accessToken, API_URL);
 		
-		//Tools.sendWelcomeMessage("774517228",  restTemplate,  phoneNumberId,  accessToken);
+	  //Tools.sendWelcomeMessage("774517228",  restTemplate,  phoneNumberId,  accessToken);
 
 		/*try {
 			//Tools.envoyerTemplate("774517228", "Ttest");

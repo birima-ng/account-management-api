@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.atom.artaccount.Tools;
+import com.atom.artaccount.dto.ApiResponse;
 import com.atom.artaccount.model.Message;
 import com.atom.artaccount.service.MessageBienvenueService;
 import com.atom.artaccount.service.MessageService;
@@ -122,14 +123,21 @@ public class WhatsAppWebhookController {
 
                                   String buttonId = (String) buttonReply.get("id");
 
-                                  switch(buttonId) {
+                                  ApiResponse response1;
+                                  
+								switch(buttonId) {
                                       case "opt1":
                                     	  message2.setMessage("opt1");
                                           messageService.createMessage(message2);
-                                    	  Tools.removeCountryCode(from);
-                                          Tools.sendText(from,
-                                                  "Vous avez choisi Option 1 !",
-                                                  restTemplate, accessToken, API_URL);
+                                    	  String num = Tools.removeCountryCode(from);
+                                    	  
+                                    	  response1 =  Tools.reinitialisationMotDePas (num);
+                                    	  
+                                    	  if(response1.getStatus()==200)
+                                    	      Tools.sendMessage(from, "Pour changer de mot de passe merci de cliquer sur "+response1.getResetLink(), restTemplate,  phoneNumberId,  accessToken);
+                                    	  else
+                                    		  Tools.sendMessage(from, "Afin d’accéder à ce service, veuillez nous écrire à partir du numéro utilisé lors de l’activation de votre compte", restTemplate,  phoneNumberId,  accessToken);
+                                          //Tools.sendText(from, "Vous avez choisi Option 1 !",restTemplate, accessToken, API_URL);
                                           break;
 
                                       case "opt2":
