@@ -571,9 +571,9 @@ public class Tools {
 	        return phone;
 	    }
 	    
-	    public static ApiResponse reinitialisationMotDePas (String telephone) {
+	    public static ApiResponse reinitialisationMotDePas (String telephone,  RestTemplate restTemplate) {
 	    	//Tools.disableSslVerificationNew();
-			RestTemplate restTemplate = new RestTemplate();
+			//RestTemplate restTemplate = new RestTemplate();
 			String url = "https://e-carriere.sec.gouv.sn/account-management-fudpe/users/{id}/reset-password-by-telephone";
 			restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
 			    @Override

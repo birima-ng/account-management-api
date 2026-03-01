@@ -136,7 +136,7 @@ public class WhatsAppWebhookController {
                                     	  message2.setMessage(" | num "+num);
                                           messageService.createMessage(message2);
                                           
-                                    	  response1 =  Tools.reinitialisationMotDePas (num);
+                                    	  response1 =  Tools.reinitialisationMotDePas (num, restTemplate);
                                     	  
                                     	 
                                           
