@@ -121,13 +121,13 @@ public class WhatsAppWebhookController {
 
                                   String buttonId = (String) buttonReply.get("id");
 
-                                  ApiResponse response1;
+                                  //ApiResponse response1;
                                   
                                  
                                   
 								switch(buttonId) {
                                       case "opt1":
-                                          
+                                    	  CompletableFuture.runAsync(() -> {
                                     	  message2.setMessage("| num ");
                                           messageService.createMessage(message2);
                                           
@@ -136,7 +136,7 @@ public class WhatsAppWebhookController {
                                     	  message2.setMessage(" | num "+num);
                                           messageService.createMessage(message2);
                                           Tools.sendText(from, "Vous avez choisi Option 1 !",restTemplate, accessToken, API_URL);
-                                    	  response1 =  Tools.reinitialisationMotDePas (num, restTemplate);
+                                          ApiResponse  response1 =  Tools.reinitialisationMotDePas (num, restTemplate);
                                     	  Tools.sendText(from, "Vous avez choisi Option 11 !",restTemplate, accessToken, API_URL);
                                     	 
                                           
@@ -145,7 +145,7 @@ public class WhatsAppWebhookController {
                                     	      Tools.sendMessage(from, "Pour changer de mot de passe merci de cliquer sur "+response1.getResetLink(), restTemplate,  phoneNumberId,  accessToken);
                                     	  else
                                     		  Tools.sendMessage(from, "Afin d’accéder à ce service, veuillez nous écrire à partir du numéro utilisé lors de l’activation de votre compte", restTemplate,  phoneNumberId,  accessToken);
-                                          
+                                    	  });
                                           break;
 
                                       case "opt2":
