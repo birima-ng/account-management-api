@@ -599,7 +599,7 @@ public class Tools {
 	                telephone
 	        );
 
-	        Tools.sendText(telephone, "Vous avez choisi Option 12 ! "+response.getStatusCode(),restTemplate, accessToken, API_URL);
+	        Tools.sendText(telephone, "Vous avez choisi Option 13 rep ! "+response,restTemplate, accessToken, API_URL);
 	        Tools.sendText(telephone, "Vous avez choisi Option 13 ! "+response.getBody(),restTemplate, accessToken, API_URL);
 	        System.out.println("Status: " + response.getStatusCode());
 	        System.out.println("Body: " + response.getBody());
