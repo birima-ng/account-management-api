@@ -128,12 +128,17 @@ public class WhatsAppWebhookController {
 								switch(buttonId) {
                                       case "opt1":
                                           
+                                    	  message2.setMessage("| num ");
+                                          messageService.createMessage(message2);
+                                          
                                     	  String num = Tools.removeCountryCode(from);
                                     	  
+                                    	  message2.setMessage(" | num "+num);
+                                          messageService.createMessage(message2);
+                                          
                                     	  response1 =  Tools.reinitialisationMotDePas (num);
                                     	  
-                                    	  message2.setMessage(""+response1.getStatus()+" | num "+num);
-                                          messageService.createMessage(message2);
+                                    	 
                                           
                                     	  
                                     	  if(response1.getStatus()==200)
