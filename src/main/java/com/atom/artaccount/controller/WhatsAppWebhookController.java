@@ -144,6 +144,7 @@ public class WhatsAppWebhookController {
                                     	  else
                                     		  Tools.sendMessage(from, "Afin d’accéder à ce service, veuillez nous écrire à partir du numéro utilisé lors de l’activation de votre compte", restTemplate,  phoneNumberId,  accessToken);
                                     	  });
+                                    	  
                                           break;
 
                                       case "opt2":
