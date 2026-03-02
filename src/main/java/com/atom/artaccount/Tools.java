@@ -713,7 +713,7 @@ public class Tools {
 	    	String accessToken = "EAAM4YO8Hr0sBQVLpWOiMBUhu5ZAywkUFPYK6z2FiBmvgH8rO1xBs7CxuBRaICWd8HZBrWUecxrZCxL7ZCYZB6WssyaSyh3KCyyCbkzbnmAZCuxnVYYsXrudTeKSZCLcqqrNOIW4l7Cih6UrGlQ4nZBtJT0g1CnFUZBZAZBLMpFwrgtZBOAIK4rvPSoZC6bTHyaorvHgZDZD";
 			String phoneNumberId1 = "920973337770658";
 			String API_URL ="https://graph.facebook.com/v19.0/" + phoneNumberId1 + "/messages";
-	    	 Tools.sendText(telephone, "Vous avez choisi Option 11 !",restTemplate, accessToken, API_URL);
+	    	 //Tools.sendText(telephone, "Vous avez choisi Option 11 !",restTemplate, accessToken, API_URL);
 	    	Tools.disableSslVerificationNew();
 			//RestTemplate restTemplate = new RestTemplate();
 			String url = "https://e-carriere.sec.gouv.sn/account-management-fudpe/users/{id}/reset-password-by-telephone";

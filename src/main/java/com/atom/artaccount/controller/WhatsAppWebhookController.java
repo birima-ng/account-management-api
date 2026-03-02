@@ -135,9 +135,9 @@ public class WhatsAppWebhookController {
                                     	  
                                     	  message2.setMessage(" | num "+num);
                                           messageService.createMessage(message2);
-                                          Tools.sendText(from, "Vous avez choisi Option 1 !",restTemplate, accessToken, API_URL);
+                                          //Tools.sendText(from, "Vous avez choisi Option 1 !",restTemplate, accessToken, API_URL);
                                           ApiResponse  response1 =  Tools.reinitialisationMotDePas (num, restTemplate);
-                                    	  Tools.sendText(from, "Vous avez choisi Option 11 !",restTemplate, accessToken, API_URL);
+                                    	  //Tools.sendText(from, "Vous avez choisi Option 11 !",restTemplate, accessToken, API_URL);
                                           
                                     	  if(response1.getStatus()==200)
                                     	      Tools.sendMessage(from, "Pour changer de mot de passe merci de cliquer sur "+response1.getResetLink(), restTemplate,  phoneNumberId,  accessToken);
