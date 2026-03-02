@@ -160,7 +160,7 @@ public class WhatsAppWebhookController {
                                     	  
                                     	  break;
                                       case "opt22": // il n'a pas tenter l'activation 'Merci d’activer votre compte en cliquant sur le lien suivant : https://e-carriere.sec.gouv.sn/#/activation-compte'
-                                    	  
+                                    	  //
                                     	  Tools.sendMessage(from, "Merci d’activer votre compte en cliquant sur le lien suivant : https://e-carriere.sec.gouv.sn/#/activation-compte", restTemplate,  phoneNumberId,  accessToken);
                                     	  
                                     	  break;
