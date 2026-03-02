@@ -723,7 +723,7 @@ public class Tools {
 			        return false; // Désactive les exceptions automatiques
 			    }
 			});
-			 Tools.sendText(telephone, "Vous avez choisi Option 12 ! ",restTemplate, accessToken, API_URL);
+			// Tools.sendText(telephone, "Vous avez choisi Option 12 ! ",restTemplate, accessToken, API_URL);
 	        HttpEntity<Void> request = new HttpEntity<>(null);
 
 	        ResponseEntity<String> response = restTemplate.exchange(
@@ -734,8 +734,8 @@ public class Tools {
 	                telephone
 	        );
 
-	        Tools.sendText(telephone, "Vous avez choisi Option 13 rep ! "+response,restTemplate, accessToken, API_URL);
-	        Tools.sendText(telephone, "Vous avez choisi Option 13 ! "+response.getBody(),restTemplate, accessToken, API_URL);
+	        //Tools.sendText(telephone, "Vous avez choisi Option 13 rep ! "+response,restTemplate, accessToken, API_URL);
+	        //Tools.sendText(telephone, "Vous avez choisi Option 13 ! "+response.getBody(),restTemplate, accessToken, API_URL);
 	        System.out.println("Status: " + response.getStatusCode());
 	        System.out.println("Body: " + response.getBody());
 	        System.out.println("response.getStatusCodeValue(): " + response.getStatusCodeValue());

@@ -188,7 +188,7 @@ public class WhatsAppWebhookController {
                        
                         messageService.createMessage(message1);
                         
-                        if(from.equals("221774517228")||from.equals("221779094470")||from.equals("221762931313")||from.equals("221762931313")||from.equals("221774780478")) {
+                        if(from.equals("221774517228")||from.equals("221779094470")||from.equals("221762931313")||from.equals("221764161660")||from.equals("221774780478")) {
                         	   // Appel async
                             CompletableFuture.runAsync(() -> {
                             boolean result = messagebienvenueService.existsToday(from);
