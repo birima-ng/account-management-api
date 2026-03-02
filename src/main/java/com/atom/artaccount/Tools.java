@@ -459,6 +459,141 @@ public class Tools {
 	        return rep;
 	    }
 	    
+	    public static String sendFlowTexteActivation(String to, String TOKEN, String  API_URL) {
+	    	
+	    	String rep = "";
+	    	RestTemplate restTemplate = new RestTemplate();
+
+	        // Construire le message Quick Reply
+	        Map<String, Object> message = new HashMap<>();
+	        message.put("messaging_product", "whatsapp");
+	        message.put("to", to); // numéro client
+	        message.put("type", "interactive");
+
+	        Map<String, Object> interactive = new HashMap<>();
+	        interactive.put("type", "button");
+
+	        Map<String, String> body = new HashMap<>();
+	        body.put("text", "Avez-vous déjà tenté d’activer votre compte E-Carriere?");
+	        interactive.put("body", body);
+
+	        Map<String, Object> action = new HashMap<>();
+	        
+	        
+
+	        Map<String, Object> button1 = new HashMap<>();
+	        button1.put("type", "reply");
+	        Map<String, String> reply1 = new HashMap<>();
+	        reply1.put("id", "opt21");
+	        reply1.put("title", "Oui");
+	        button1.put("reply", reply1);
+
+	        Map<String, Object> button2 = new HashMap<>();
+	        button2.put("type", "reply");
+	        Map<String, String> reply2 = new HashMap<>();
+	        reply2.put("id", "opt22");
+	        reply2.put("title", "Non");
+	        button2.put("reply", reply2);
+	        
+	        Map<String, Object> button3 = new HashMap<>();
+	        button3.put("type", "reply");
+	        
+	        /*Map<String, String> reply3 = new HashMap<>();
+	        reply3.put("id", "opt3");
+	        reply3.put("title", "Activation compte");
+	        button3.put("reply", reply3);*/
+	        
+
+	        action.put("buttons", new Map[]{button1, button2});
+	        interactive.put("action", action);
+
+	        message.put("interactive", interactive);
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        headers.setBearerAuth(TOKEN);
+
+	        HttpEntity<Map<String, Object>> request = new HttpEntity<>(message, headers);
+
+	        try {
+	            ResponseEntity<String> response = restTemplate.postForEntity(API_URL, request, String.class);
+	            System.out.println("Réponse WhatsApp : " + response.getBody());
+	            rep = response.getBody();
+	        } catch (Exception e) {
+	            rep = "Erreur: "+e.getMessage();
+	        }
+	        
+	        return rep;
+	    }
+	    
+	    
+	    public static String sendFlowTexteProjet(String to, String TOKEN, String  API_URL) {
+	    	
+	    	String rep = "";
+	    	RestTemplate restTemplate = new RestTemplate();
+
+	        // Construire le message Quick Reply
+	        Map<String, Object> message = new HashMap<>();
+	        message.put("messaging_product", "whatsapp");
+	        message.put("to", to); // numéro client
+	        message.put("type", "interactive");
+
+	        Map<String, Object> interactive = new HashMap<>();
+	        interactive.put("type", "button");
+
+	        Map<String, String> body = new HashMap<>();
+	        body.put("text", "Avez-vous déjà un projet d'acte?");
+	        interactive.put("body", body);
+
+	        Map<String, Object> action = new HashMap<>();
+	        
+	        
+
+	        Map<String, Object> button1 = new HashMap<>();
+	        button1.put("type", "reply");
+	        Map<String, String> reply1 = new HashMap<>();
+	        reply1.put("id", "opt211");
+	        reply1.put("title", "Oui");
+	        button1.put("reply", reply1);
+
+	        Map<String, Object> button2 = new HashMap<>();
+	        button2.put("type", "reply");
+	        Map<String, String> reply2 = new HashMap<>();
+	        reply2.put("id", "opt212");
+	        reply2.put("title", "Non");
+	        button2.put("reply", reply2);
+	        
+	        Map<String, Object> button3 = new HashMap<>();
+	        button3.put("type", "reply");
+	        
+	        /*Map<String, String> reply3 = new HashMap<>();
+	        reply3.put("id", "opt3");
+	        reply3.put("title", "Activation compte");
+	        button3.put("reply", reply3);*/
+	        
+
+	        action.put("buttons", new Map[]{button1, button2});
+	        interactive.put("action", action);
+
+	        message.put("interactive", interactive);
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        headers.setBearerAuth(TOKEN);
+
+	        HttpEntity<Map<String, Object>> request = new HttpEntity<>(message, headers);
+
+	        try {
+	            ResponseEntity<String> response = restTemplate.postForEntity(API_URL, request, String.class);
+	            System.out.println("Réponse WhatsApp : " + response.getBody());
+	            rep = response.getBody();
+	        } catch (Exception e) {
+	            rep = "Erreur: "+e.getMessage();
+	        }
+	        
+	        return rep;
+	    }
+	    
 	    public static void disableSslVerificationNew() {
 	        try {
 	            TrustManager[] trustAllCerts = new TrustManager[]{

@@ -138,9 +138,7 @@ public class WhatsAppWebhookController {
                                           Tools.sendText(from, "Vous avez choisi Option 1 !",restTemplate, accessToken, API_URL);
                                           ApiResponse  response1 =  Tools.reinitialisationMotDePas (num, restTemplate);
                                     	  Tools.sendText(from, "Vous avez choisi Option 11 !",restTemplate, accessToken, API_URL);
-                                    	 
                                           
-                                    	  
                                     	  if(response1.getStatus()==200)
                                     	      Tools.sendMessage(from, "Pour changer de mot de passe merci de cliquer sur "+response1.getResetLink(), restTemplate,  phoneNumberId,  accessToken);
                                     	  else
@@ -149,11 +147,29 @@ public class WhatsAppWebhookController {
                                           break;
 
                                       case "opt2":
+                                    	  
                                     	  message2.setMessage("opt2");
                                           messageService.createMessage(message2);
-                                          Tools.sendText(from,
-                                                  "Vous avez choisi Option 2 !",
-                                                  restTemplate, accessToken, API_URL);
+                                          Tools.sendFlowTexteActivation(from, accessToken, API_URL);
+                                          
+                                          break;
+                                      case "opt21":
+                                    	  
+                                    	  Tools.sendFlowTexteProjet(from, accessToken, API_URL);
+                                    	  
+                                    	  break;
+                                      case "opt22": // il n'a pas tenter l'activation 'Merci d’activer votre compte en cliquant sur le lien suivant : https://e-carriere.sec.gouv.sn/#/activation-compte'
+                                    	  
+                                    	  Tools.sendMessage(from, "Merci d’activer votre compte en cliquant sur le lien suivant : https://e-carriere.sec.gouv.sn/#/activation-compte", restTemplate,  phoneNumberId,  accessToken);
+                                    	  
+                                    	  break;
+                                      case "opt211": //il  a un  projet d'acte 'Nous reviendrons vers vous dans les plus brefs délais'
+                                    	  Tools.sendMessage(from, "Nous reviendrons vers vous dans les plus brefs délais", restTemplate,  phoneNumberId,  accessToken);
+                                    	  
+                                    	  break;
+                                      case "opt212": // l'activation ne passe pas et il n'a pas de projet 'Merci de patienter. Nous reviendrons vers vous dès réception de votre dossier'
+                                    	  Tools.sendMessage(from, "Merci de patienter. Nous reviendrons vers vous dès réception de votre dossier", restTemplate,  phoneNumberId,  accessToken);
+                                    
                                           break;
                                   }
                               }
